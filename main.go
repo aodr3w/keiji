@@ -159,7 +159,7 @@ func NewInitCMD() *cobra.Command {
 }
 
 func taskCMD() *cobra.Command {
-	var create, disable, delete, restart, get bool
+	var create, disable, delete, restart, get, force bool
 	var name, description string
 	taskCMD := cobra.Command{
 		Use:   "task",
@@ -177,7 +177,7 @@ func taskCMD() *cobra.Command {
 				if !valid(description) {
 					return fmt.Errorf("please provide a description for your task")
 				}
-				return createTask(name, description)
+				return createTask(name, description, force)
 			}
 			if disable {
 				return disableTask(name)
@@ -202,9 +202,10 @@ func taskCMD() *cobra.Command {
 	taskCMD.Flags().BoolVar(&delete, "delete", false, "provide true to delete task")
 	taskCMD.Flags().BoolVar(&restart, "restart", false, "provide true to restart task")
 	taskCMD.Flags().BoolVar(&get, "get", false, "provid true to get task info (returns all tasks if name not provided)")
+	taskCMD.Flags().BoolVar(&force, "force", false, "provid true to force createTask operation")
 	return &taskCMD
 }
-func createTask(name string, description string) error {
+func createTask(name string, description string, force bool) error {
 	//check if task exists
 	taskPath := filepath.Join(paths.TASKS_PATH, name)
 	exists, err := utils.DirectoryExists(taskPath)
@@ -212,8 +213,17 @@ func createTask(name string, description string) error {
 		return err
 	}
 	if exists {
-		log.Println("task already exists in TASK_PATH")
-		return nil
+		if force {
+			//delete task folder
+			err := os.RemoveAll(taskPath)
+			if err != nil {
+				return err
+			}
+		} else {
+			log.Println("task already exists in TASK_PATH")
+			return nil
+		}
+
 	}
 	//create task
 	err = os.MkdirAll(taskPath, 0755)
