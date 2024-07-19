@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	cmdErrors "github.com/aodr3w/keiji-cli/errors"
+	c "github.com/aodr3w/keiji-core/constants"
 	"github.com/aodr3w/keiji-core/db"
 	"github.com/aodr3w/keiji-core/paths"
 	"github.com/aodr3w/keiji-core/utils"
@@ -63,6 +64,7 @@ func init() {
 		return nil
 	}
 	rootCmd.AddCommand(NewInitCMD())
+	rootCmd.AddCommand(taskCMD())
 }
 
 func getTemplateRepoPath() (string, error) {
@@ -129,7 +131,7 @@ func createWorkSpace() error {
 	return nil
 }
 func NewInitCMD() *cobra.Command {
-	initCMD := &cobra.Command{
+	return &cobra.Command{
 		Use:   "init",
 		Short: "initialize workspace",
 		Long:  "initializes workspace by creating required directories and installing services",
@@ -145,12 +147,141 @@ func NewInitCMD() *cobra.Command {
 				if err != nil {
 					return err
 				}
+				cmdRepo, err = getRepo()
+				if err != nil {
+					return err
+				}
 			}
 
 			return nil
 		},
 	}
-	return initCMD
+}
+
+func taskCMD() *cobra.Command {
+	var create, disable, delete, restart, get bool
+	var name, description string
+	taskCMD := cobra.Command{
+		Use:   "task",
+		Short: "keiji task management",
+		Long:  "cobra commands to create, update, deploy, or delete tasks",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			err := checkWorkSpace()
+			if err != nil {
+				return err
+			}
+			if !valid(name) {
+				return fmt.Errorf("please provide name for your task")
+			}
+			if create {
+				if !valid(description) {
+					return fmt.Errorf("please provide a description for your task")
+				}
+				return createTask(name, description)
+			}
+			if disable {
+				return disableTask(name)
+			}
+			if get {
+				return getTask(name)
+			}
+			if delete {
+				return deleteTask(name)
+			}
+			if restart {
+				return restartTask(name)
+			}
+			return fmt.Errorf("please pass a valid command")
+
+		},
+	}
+	taskCMD.Flags().StringVar(&name, "name", "", "provid a name for your task")
+	taskCMD.Flags().StringVar(&description, "desc", "", "provid a description for your task")
+	taskCMD.Flags().BoolVar(&create, "create", false, "provide true to create task")
+	taskCMD.Flags().BoolVar(&disable, "disable", false, "provide true to disable task")
+	taskCMD.Flags().BoolVar(&delete, "delete", false, "provide true to delete task")
+	taskCMD.Flags().BoolVar(&restart, "restart", false, "provide true to restart task")
+	taskCMD.Flags().BoolVar(&get, "get", false, "provid true to get task info (returns all tasks if name not provided)")
+	return &taskCMD
+}
+func createTask(name string, description string) error {
+	//check if task exists
+	taskPath := filepath.Join(paths.TASKS_PATH, name)
+	exists, err := utils.DirectoryExists(taskPath)
+	if err != nil {
+		return err
+	}
+	if exists {
+		log.Println("task already exists in TASK_PATH")
+		return nil
+	}
+	//create task
+	err = os.MkdirAll(taskPath, 0755)
+	if err != nil {
+		return err
+	}
+	repoPath, err := getTemplateRepoPath()
+	if err != nil {
+		return err
+	}
+	log.Println("copying template files")
+	for _, f := range []string{"function", "schedule"} {
+		dstPath := filepath.Join(taskPath, f)
+		err = os.MkdirAll(dstPath, 0755)
+		if err != nil {
+			return err
+		}
+		err = utils.CopyFile(
+			filepath.Join(repoPath, "templates", "tasks", fmt.Sprintf("%v/main.go", f)),
+			fmt.Sprintf("%v/main.go", dstPath),
+		)
+		if err != nil {
+			return err
+		} else {
+			log.Println(aurora.Green(fmt.Sprintf("%v copied", f)))
+		}
+	}
+
+	return writeEnvFile(taskPath, name, description)
+}
+
+func disableTask(name string) error {
+	log.Printf("disabling task %v\n", name)
+	return nil
+}
+
+func deleteTask(name string) error {
+	log.Printf("deleting task %v\n", name)
+	return nil
+}
+func restartTask(name string) error {
+	log.Printf("restarting task %v\n", name)
+	return nil
+}
+
+func getTask(name string) error {
+	if valid(name) {
+		log.Printf("getting task %v\n", name)
+	} else {
+		log.Printf("getting all tasks..")
+	}
+	return nil
+}
+func valid(data interface{}) bool {
+	switch v := data.(type) {
+	case c.Service:
+		return len(v) > 0
+	case Editor:
+		return len(v) > 0 && v == "code" || v == "vim" || v == "nano"
+	case string:
+		return len(v) > 0
+	case int:
+		return v >= 1
+	case bool:
+		return true
+	default:
+		return false
+	}
 }
 
 func runCMD(targetDir string, ss ...string) error {
@@ -166,6 +297,17 @@ func runCMD(targetDir string, ss ...string) error {
 		return fmt.Errorf("failed to run go command: %v , output: %s", err, out)
 	}
 	return nil
+}
+
+func writeEnvFile(taskDir, task, description string) error {
+	envFilePath := filepath.Join(taskDir, ".env")
+	envFile, err := os.Create(envFilePath)
+	if err != nil {
+		return err
+	}
+	defer envFile.Close()
+	_, err = envFile.WriteString(fmt.Sprintf("TASK_NAME='%s'\nTASK_DESCRIPTION='%s'\n", task, description))
+	return err
 }
 
 func main() {
