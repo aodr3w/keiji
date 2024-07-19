@@ -3,7 +3,7 @@ module github.com/aodr3w/keiji-cli
 go 1.22.1
 
 require (
-	github.com/aodr3w/keiji-core v0.1.1
+	github.com/aodr3w/keiji-core v0.1.2
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 )
 

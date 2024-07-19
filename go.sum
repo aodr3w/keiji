@@ -1,5 +1,7 @@
 github.com/aodr3w/keiji-core v0.1.1 h1:IUUOQkDaHPRxoahc08lb1Sx29PSnfUHEh7JSOmk0YiE=
 github.com/aodr3w/keiji-core v0.1.1/go.mod h1:lE+6eENnOK1EdYERNgobd/UjSH9uhDgjEn68bVw+NRo=
+github.com/aodr3w/keiji-core v0.1.2 h1:ZYIKVK3so5Hoj+cngrEM5JsdrFp2iow8twOxpVqtBv4=
+github.com/aodr3w/keiji-core v0.1.2/go.mod h1:lE+6eENnOK1EdYERNgobd/UjSH9uhDgjEn68bVw+NRo=
 github.com/aodr3w/logger v0.1.0 h1:F+mrWWfzBTPbTCKf8258dFi3lmIK2s2ETtqUIxHv96k=
 github.com/aodr3w/logger v0.1.0/go.mod h1:DT4Tj2GLcyqSDJ4tGbKJk9Df0WA2EJ8wUlP1FJ+YFqE=
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
