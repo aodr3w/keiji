@@ -27,6 +27,12 @@ var cmdRepo *db.Repo
 // 	c.TCP_BUS:   paths.TCP_BUS_LOGS,
 // }
 
+var serviceRepos = map[c.Service]string{
+	c.SCHEDULER: "github.com/aodr3w/keiji-scheduler",
+	c.HTTP:      "github.com/aodr3w/keiji-server",
+	c.TCP_BUS:   "github.com/aodr3w/keiji-bus",
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "keiji",
 	Short: "keiji CLI",
@@ -68,7 +74,7 @@ func init() {
 }
 
 func getTemplateRepoPath() (string, error) {
-	err := runCMD(paths.WORKSPACE, "go", "get", "-u", "github.com/aodr3w/keiji-core")
+	err := runCMD(paths.WORKSPACE, false, "go", "get", "-u", "github.com/aodr3w/keiji-core")
 	if err != nil {
 		fmt.Printf("Error pulling repository: %v\n", err)
 		return "", err
@@ -99,7 +105,7 @@ func createWorkSpace() error {
 		return err
 	}
 	//do a go mod init workspace
-	err = runCMD(paths.WORKSPACE, "go", "mod", "init", "workspace")
+	err = runCMD(paths.WORKSPACE, false, "go", "mod", "init", "workspace")
 	if err != nil && !strings.Contains(err.Error(), "already exists") {
 		return err
 	}
@@ -130,7 +136,47 @@ func createWorkSpace() error {
 	}
 	return nil
 }
+
+func allServicesInstalled() ([]c.Service, bool) {
+	missingServices := make([]c.Service, 0)
+	ok := true
+	for service, servicePath := range serviceRepos {
+		if !isServiceInstalled(servicePath) {
+			log.Println(aurora.Red(fmt.Sprintf("service %s not found", service)))
+			missingServices = append(missingServices, service)
+			if ok {
+				ok = false
+			}
+		}
+	}
+	return missingServices, ok
+}
+
+func isServiceInstalled(servicePath string) bool {
+	err := runCMD(paths.WORKSPACE, true, "go", "list", "-m", servicePath)
+	return err == nil
+}
+func InstallService(service c.Service, update bool) error {
+	repoURL, ok := serviceRepos[service]
+	if !ok {
+		return fmt.Errorf("please provide repo url for %s", service)
+	}
+	if isServiceInstalled(repoURL) && !update {
+		log.Println(
+			aurora.BrightGreen(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service)))
+	} else {
+		log.Println(aurora.Yellow(fmt.Sprintf("installing or updating service %s", service)))
+		err := runCMD(paths.WORKSPACE, true, "go", "install", fmt.Sprintf("%v@latest", repoURL))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 func NewInitCMD() *cobra.Command {
+	//TODO
+	/*add service installion to init process
+	 */
 	return &cobra.Command{
 		Use:   "init",
 		Short: "initialize workspace",
@@ -143,7 +189,7 @@ func NewInitCMD() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				err = runCMD(paths.WORKSPACE, "go", "get", "github.com/aodr3w/keiji-tasks@latest")
+				err = runCMD(paths.WORKSPACE, false, "go", "get", "github.com/aodr3w/keiji-tasks@latest")
 				if err != nil {
 					return err
 				}
@@ -152,7 +198,25 @@ func NewInitCMD() *cobra.Command {
 					return err
 				}
 			}
-
+			//install services after initializing work space
+			ms, ok := allServicesInstalled()
+			if !ok {
+				//clear mod cache first
+				err := runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
+				if err != nil {
+					return err
+				}
+				for _, s := range ms {
+					err := InstallService(s, false)
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				if len(ms) > 0 {
+					return fmt.Errorf("missing services %v", ms)
+				}
+			}
 			return nil
 		},
 	}
@@ -294,17 +358,18 @@ func valid(data interface{}) bool {
 	}
 }
 
-func runCMD(targetDir string, ss ...string) error {
+func runCMD(targetDir string, silence bool, ss ...string) error {
 	if len(ss) == 0 {
 		return fmt.Errorf("no command provided")
 	}
 	cmd := exec.Command(ss[0], ss[1:]...)
 	cmd.Dir = targetDir
 	output, err := cmd.CombinedOutput()
-	out := string(output)
-	log.Println(out)
+	if !silence {
+		log.Printf("[runCMD]: %v\n", string(output))
+	}
 	if err != nil {
-		return fmt.Errorf("failed to run go command: %v , output: %s", err, out)
+		return fmt.Errorf("failed to run go command: %v , output: %s", err, string(output))
 	}
 	return nil
 }
