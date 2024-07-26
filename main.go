@@ -147,8 +147,6 @@ func allServicesInstalled() ([]c.Service, bool) {
 			if ok {
 				ok = false
 			}
-		} else {
-			log.Println(aurora.Green(fmt.Sprintf("service %s already installed", service)))
 		}
 	}
 	return missingServices, ok
