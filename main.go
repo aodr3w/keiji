@@ -29,7 +29,7 @@ var cmdRepo *db.Repo
 
 var serviceRepos = map[c.Service]string{
 	c.SCHEDULER: "github.com/aodr3w/keiji-scheduler",
-	c.HTTP:      "github.com/aodr3w/keiji-server",
+	c.SERVER:    "github.com/aodr3w/keiji-server",
 	c.TCP_BUS:   "github.com/aodr3w/keiji-bus",
 }
 
@@ -140,28 +140,43 @@ func createWorkSpace() error {
 func allServicesInstalled() ([]c.Service, bool) {
 	missingServices := make([]c.Service, 0)
 	ok := true
-	for service, servicePath := range serviceRepos {
-		if !isServiceInstalled(servicePath) {
+	for service := range serviceRepos {
+		if !isServiceInstalled(service) {
 			log.Println(aurora.Red(fmt.Sprintf("service %s not found", service)))
 			missingServices = append(missingServices, service)
 			if ok {
 				ok = false
 			}
+		} else {
+			log.Println(aurora.Green(fmt.Sprintf("service %s already installed", service)))
 		}
 	}
 	return missingServices, ok
 }
 
-func isServiceInstalled(servicePath string) bool {
-	err := runCMD(paths.WORKSPACE, true, "go", "list", "-m", servicePath)
-	return err == nil
+func isServiceInstalled(service c.Service) bool {
+	gopath := os.Getenv("GOPATH")
+	if !valid(gopath) {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			log.Println(aurora.Red(fmt.Sprintf("failed to get home directory: %v", err)))
+			return false
+		}
+		gopath = filepath.Join(homeDir, "go")
+	}
+	binPath := filepath.Join(gopath, "bin", fmt.Sprintf("%v-%v", "keiji", service))
+	ok, err := utils.DirectoryExists(binPath)
+	if err != nil {
+		log.Println(aurora.Red(fmt.Sprintf("%v", err)))
+	}
+	return err == nil && ok
 }
 func InstallService(service c.Service, update bool) error {
 	repoURL, ok := serviceRepos[service]
 	if !ok {
 		return fmt.Errorf("please provide repo url for %s", service)
 	}
-	if isServiceInstalled(repoURL) && !update {
+	if isServiceInstalled(service) && !update {
 		log.Println(
 			aurora.BrightGreen(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service)))
 	} else {
