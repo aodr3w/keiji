@@ -354,6 +354,57 @@ func getTask(name string) error {
 	}
 	return nil
 }
+
+func NewSystemCMD() {
+	//start stop update system services
+	var start, stop, logs bool
+	var server, scheduler, bus bool
+	systemCMD := cobra.Command{
+		Use:   "system",
+		Short: "manage system services",
+		Long:  "commands start, stop and diagnose system services",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if start {
+				if server {
+					log.Println("starting server")
+				} else if scheduler {
+					log.Println("starting scheduler")
+				} else if bus {
+					log.Println("starting bus")
+				} else {
+					log.Println("starting all services")
+				}
+
+			}
+			if stop {
+				if server {
+					log.Println("stopping server")
+				} else if scheduler {
+					log.Println("stopping scheduler")
+				} else if bus {
+					log.Println("stopping tcp-bus")
+				} else {
+					log.Println("stoping all services")
+				}
+
+			}
+			if logs {
+				if server {
+					log.Println("opening server log")
+				} else if scheduler {
+					log.Println("opening scheduler log")
+				} else if bus {
+					log.Println("opening bus log ")
+				}
+				return fmt.Errorf("please provide a valid service name e.g --server, --scheduler, --bus")
+			}
+			return nil
+		},
+	}
+	systemCMD.Flags().BoolVar(&start, "start", false, "starts system services")
+	systemCMD.Flags().BoolVar(&stop, "stop", false, "stops system services")
+	systemCMD.Flags().BoolVar(&logs, "logs", false, "opens service logs in editor")
+}
 func valid(data interface{}) bool {
 	switch v := data.(type) {
 	case c.Service:
