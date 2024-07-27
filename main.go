@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/fs"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	cmdErrors "github.com/aodr3w/keiji-cli/errors"
@@ -14,6 +16,7 @@ import (
 	"github.com/aodr3w/keiji-core/db"
 	"github.com/aodr3w/keiji-core/paths"
 	"github.com/aodr3w/keiji-core/utils"
+	"github.com/aodr3w/logger"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
@@ -141,7 +144,7 @@ func allServicesInstalled() ([]c.Service, bool) {
 	missingServices := make([]c.Service, 0)
 	ok := true
 	for service := range serviceRepos {
-		if !isServiceInstalled(service) {
+		if _, ok := isServiceInstalled(service); !ok {
 			log.Println(aurora.Red(fmt.Sprintf("service %s not found", service)))
 			missingServices = append(missingServices, service)
 			if ok {
@@ -152,13 +155,13 @@ func allServicesInstalled() ([]c.Service, bool) {
 	return missingServices, ok
 }
 
-func isServiceInstalled(service c.Service) bool {
+func isServiceInstalled(service c.Service) (string, bool) {
 	gopath := os.Getenv("GOPATH")
 	if !valid(gopath) {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
 			log.Println(aurora.Red(fmt.Sprintf("failed to get home directory: %v", err)))
-			return false
+			return "", false
 		}
 		gopath = filepath.Join(homeDir, "go")
 	}
@@ -167,14 +170,23 @@ func isServiceInstalled(service c.Service) bool {
 	if err != nil {
 		log.Println(aurora.Red(fmt.Sprintf("%v", err)))
 	}
-	return err == nil && ok
+	if err != nil {
+		return "", false
+	}
+
+	if !ok {
+		return "", false
+	}
+
+	return binPath, true
 }
+
 func InstallService(service c.Service, update bool) error {
 	repoURL, ok := serviceRepos[service]
 	if !ok {
 		return fmt.Errorf("please provide repo url for %s", service)
 	}
-	if isServiceInstalled(service) && !update {
+	if _, ok := isServiceInstalled(service); ok && !update {
 		log.Println(
 			aurora.BrightGreen(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service)))
 	} else {
@@ -183,6 +195,7 @@ func InstallService(service c.Service, update bool) error {
 		if err != nil {
 			return err
 		}
+
 	}
 	return nil
 }
@@ -366,35 +379,34 @@ func NewSystemCMD() {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if start {
 				if server {
-					log.Println("starting server")
+					return startService(c.SERVER)
 				} else if scheduler {
-					log.Println("starting scheduler")
+					return startService(c.SCHEDULER)
 				} else if bus {
-					log.Println("starting bus")
+					return startService(c.TCP_BUS)
 				} else {
-					log.Println("starting all services")
+					return startAllServices()
 				}
-
 			}
 			if stop {
 				if server {
-					log.Println("stopping server")
+					return stopService(c.SERVER)
 				} else if scheduler {
-					log.Println("stopping scheduler")
+					return stopService(c.SCHEDULER)
 				} else if bus {
-					log.Println("stopping tcp-bus")
+					return stopService(c.TCP_BUS)
 				} else {
-					log.Println("stoping all services")
+					return stopAllServices()
 				}
 
 			}
 			if logs {
 				if server {
-					log.Println("opening server log")
+					return getServiceLogs(c.SERVER)
 				} else if scheduler {
-					log.Println("opening scheduler log")
+					return getServiceLogs(c.SCHEDULER)
 				} else if bus {
-					log.Println("opening bus log ")
+					return getServiceLogs(c.TCP_BUS)
 				}
 				return fmt.Errorf("please provide a valid service name e.g --server, --scheduler, --bus")
 			}
@@ -404,6 +416,113 @@ func NewSystemCMD() {
 	systemCMD.Flags().BoolVar(&start, "start", false, "starts system services")
 	systemCMD.Flags().BoolVar(&stop, "stop", false, "stops system services")
 	systemCMD.Flags().BoolVar(&logs, "logs", false, "opens service logs in editor")
+}
+
+func getServiceLogPath(service c.Service) (string, error) {
+	switch service {
+	case c.SERVER:
+		return paths.HTTP_SERVER_LOGS, nil
+	case c.SCHEDULER:
+		return paths.SCHEDULER_LOGS, nil
+	case c.TCP_BUS:
+		return paths.TCP_BUS_LOGS, nil
+	default:
+		return "", fmt.Errorf("invalid service name %v", service)
+	}
+}
+
+func startService(service c.Service) error {
+	//we need to run the service while also retrieving its pid
+	//get service log file
+	err := runServiceCMD(service)
+	if err != nil {
+		return err
+	}
+	pid, err := readPID(paths.PID_PATH(service))
+	if err != nil {
+		return err
+	}
+	log.Printf("service started with pid %v\n", pid)
+	return nil
+}
+func readPID(pidPath string) (int, error) {
+	exists, err := utils.DirectoryExists(filepath.Dir(pidPath))
+
+	if err != nil {
+		return -1, err
+	}
+
+	if !exists {
+		return -1, fmt.Errorf("pid path not found")
+	}
+	f, err := os.Open(pidPath)
+	if err != nil {
+		return -1, err
+	}
+	reader := bufio.NewReader(f)
+	data, err := reader.ReadBytes('\n')
+	if err != nil {
+		return -1, err
+	}
+	pid, err := strconv.Atoi(strings.ReplaceAll(string(data), "\n", ""))
+
+	if err != nil {
+		return -1, err
+	}
+
+	return pid, nil
+}
+func stopService(service c.Service) error {
+	//stop service using its pid
+	return nil
+}
+
+func getServiceLogs(service c.Service) error {
+	return nil
+}
+
+func startAllServices() error {
+	for _, service := range c.SERVICES {
+		err := startService(service)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func stopAllServices() error {
+	for _, service := range c.SERVICES {
+		err := stopService(service)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func getGoBinPath(service c.Service) (string, error) {
+	path := os.Getenv("GOBIN")
+	if !valid(path) {
+		path = os.Getenv("GOPATH")
+		if !valid(path) {
+			path = filepath.Join(os.Getenv("HOME"), "go", "bin")
+		} else {
+			path = filepath.Join(path, "bin")
+		}
+	}
+	//check that the path exists
+	exists, err := utils.DirectoryExists(path)
+	if err != nil {
+		return "", err
+	}
+	if !exists {
+		return "", fmt.Errorf("path %v does not exist", path)
+	}
+	//check for existence of service bin
+	serviceBin, ok := isServiceInstalled(service)
+	if !ok {
+		return "", fmt.Errorf("bin for service %s not found", service)
+	}
+	return serviceBin, nil
 }
 func valid(data interface{}) bool {
 	switch v := data.(type) {
@@ -420,6 +539,29 @@ func valid(data interface{}) bool {
 	default:
 		return false
 	}
+}
+
+func runServiceCMD(service c.Service) error {
+	logsPath, err := getServiceLogPath(service)
+	if err != nil {
+		return err
+	}
+	_, err = logger.NewFileLogger(logsPath)
+	if err != nil {
+		return err
+	}
+	pidPath := paths.PID_PATH(service)
+	err = os.MkdirAll(filepath.Dir(pidPath), 0755)
+	if err != nil {
+		return err
+	}
+	cmdStr := fmt.Sprintf("keiji-%s > %v 2>&1 & echo $! > %v", service, logsPath, pidPath)
+	cmd := exec.Command("sh", "-c", cmdStr)
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to start command: %v", err)
+	}
+	return nil
 }
 
 func runCMD(targetDir string, silence bool, ss ...string) error {
@@ -459,4 +601,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// if err := startService(c.SERVER); err != nil {
+	// 	log.Printf("error starting service %s, err: %v ", c.SERVER, err)
+	// }
 }

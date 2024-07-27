@@ -3,7 +3,7 @@ module github.com/aodr3w/keiji-cli
 go 1.22.1
 
 require (
-	github.com/aodr3w/keiji-core v0.1.6
+	github.com/aodr3w/keiji-core v0.1.7
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 )
 
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	github.com/aodr3w/logger v0.1.0 // indirect
+	github.com/aodr3w/logger v0.1.0
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.6.0 // indirect
