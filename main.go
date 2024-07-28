@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 
 	cmdErrors "github.com/aodr3w/keiji-cli/errors"
 	c "github.com/aodr3w/keiji-core/constants"
@@ -486,18 +487,21 @@ func stopService(service c.Service) error {
 	pidPath := paths.PID_PATH(service)
 	exists, err := utils.PathExists(pidPath)
 	if err != nil {
-		return err
+		log.Printf("error retrieving pidPath: %v\n", err)
+		return nil
 	}
 	if !exists {
-		return fmt.Errorf("pid path not found")
+		log.Printf("pid path not found for service: %v\n", service)
+		return nil
 	}
 	PID, err := readPID(pidPath)
 	if err != nil {
-		return err
+		log.Printf("error reading service PID: %v\n", err)
+		return nil
 	}
-	err = runCMD(paths.WORKSPACE, false, "kill", "9", fmt.Sprintf("%d", PID))
+	err = syscall.Kill(PID, syscall.SIGINT)
 	if err != nil {
-		return err
+		log.Printf("kill error: %v", err)
 	}
 	return nil
 }
