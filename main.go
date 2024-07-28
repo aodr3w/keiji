@@ -56,12 +56,9 @@ func getRepo() (*db.Repo, error) {
 }
 
 func checkWorkSpace() error {
-	fmt.Println("checking workspace")
 	var err error
 	if !utils.IsInit() {
-		err := fmt.Errorf("unitialized workspace error")
-		log.Println(aurora.Red("please initialize your workspace to continue"))
-		return err
+		return fmt.Errorf("please initialize your workspace to continue")
 	}
 	if cmdRepo == nil {
 		cmdRepo, err = getRepo()
@@ -162,7 +159,7 @@ func isServiceInstalled(service c.Service) (string, bool) {
 	if !valid(gopath) {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
-			log.Println(aurora.Red(fmt.Sprintf("failed to get home directory: %v", err)))
+			logError(err)
 			return "", false
 		}
 		gopath = filepath.Join(homeDir, "go")
@@ -170,9 +167,7 @@ func isServiceInstalled(service c.Service) (string, bool) {
 	binPath := filepath.Join(gopath, "bin", fmt.Sprintf("%v-%v", "keiji", service))
 	ok, err := utils.PathExists(binPath)
 	if err != nil {
-		log.Println(aurora.Red(fmt.Sprintf("%v", err)))
-	}
-	if err != nil {
+		logError(err)
 		return "", false
 	}
 
@@ -215,15 +210,18 @@ func NewInitCMD() *cobra.Command {
 				log.Println(aurora.Yellow("Initializing work space..."))
 				err := createWorkSpace()
 				if err != nil {
-					return err
+					logError(err)
+					return nil
 				}
 				err = runCMD(paths.WORKSPACE, false, "go", "get", "github.com/aodr3w/keiji-tasks@latest")
 				if err != nil {
-					return err
+					logError(err)
+					return nil
 				}
 				cmdRepo, err = getRepo()
 				if err != nil {
-					return err
+					logError(err)
+					return nil
 				}
 			}
 			//install services after initializing work space
@@ -232,17 +230,19 @@ func NewInitCMD() *cobra.Command {
 				//clear mod cache first
 				err := runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
 				if err != nil {
-					return err
+					logError(err)
+					return nil
 				}
 				for _, s := range ms {
 					err := InstallService(s, false)
 					if err != nil {
-						return err
+						logError(err)
+						return nil
 					}
 				}
 			} else {
 				if len(ms) > 0 {
-					return fmt.Errorf("missing services %v", ms)
+					logError(fmt.Errorf("missing services %v", ms))
 				}
 			}
 			return nil
@@ -250,6 +250,9 @@ func NewInitCMD() *cobra.Command {
 	}
 }
 
+func logError(err error) {
+	log.Println(aurora.Red(err))
+}
 func taskCMD() *cobra.Command {
 	var create, disable, delete, restart, get, force bool
 	var name, description string
@@ -258,33 +261,36 @@ func taskCMD() *cobra.Command {
 		Short: "keiji task management",
 		Long:  "cobra commands to create, update, deploy, or delete tasks",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := checkWorkSpace()
-			if err != nil {
-				return err
+			var taskError error
+			if err := checkWorkSpace(); err != nil {
+				logError(err)
+				return nil
 			}
 			if !valid(name) {
-				return fmt.Errorf("please provide name for your task")
+				logError(fmt.Errorf("please provide name for your task"))
+				return nil
 			}
 			if create {
 				if !valid(description) {
-					return fmt.Errorf("please provide a description for your task")
+					taskError = fmt.Errorf("please provide a description for your task")
+				} else {
+					taskError = createTask(name, description, force)
 				}
-				return createTask(name, description, force)
+			} else if disable {
+				taskError = disableTask(name)
+			} else if get {
+				taskError = getTask(name)
+			} else if delete {
+				taskError = deleteTask(name)
+			} else if restart {
+				taskError = restartTask(name)
+			} else {
+				return fmt.Errorf("please pass a valid command")
 			}
-			if disable {
-				return disableTask(name)
+			if taskError != nil {
+				logError(taskError)
 			}
-			if get {
-				return getTask(name)
-			}
-			if delete {
-				return deleteTask(name)
-			}
-			if restart {
-				return restartTask(name)
-			}
-			return fmt.Errorf("please pass a valid command")
-
+			return nil
 		},
 	}
 	taskCMD.Flags().StringVar(&name, "name", "", "provid a name for your task")
@@ -380,40 +386,57 @@ func NewSystemCMD() *cobra.Command {
 		Short: "manage system services",
 		Long:  "commands start, stop and diagnose system services",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := checkWorkSpace(); err != nil {
+				logError(err)
+				return nil
+			}
 			if start {
+				var startError error
 				if server {
-					return startService(c.SERVER)
+					startError = startService(c.SERVER)
 				} else if scheduler {
-					return startService(c.SCHEDULER)
+					startError = startService(c.SCHEDULER)
 				} else if bus {
-					return startService(c.TCP_BUS)
+					startError = startService(c.TCP_BUS)
 				} else {
-					return startAllServices()
+					startError = startAllServices()
 				}
-			}
-			if stop {
+				if startError != nil {
+					logError(startError)
+				}
+				return nil
+			} else if stop {
+				var stopError error
 				if server {
-					return stopService(c.SERVER)
+					stopError = stopService(c.SERVER)
 				} else if scheduler {
-					return stopService(c.SCHEDULER)
+					stopError = stopService(c.SCHEDULER)
 				} else if bus {
-					return stopService(c.TCP_BUS)
+					stopError = stopService(c.TCP_BUS)
 				} else {
-					return stopAllServices()
+					stopError = stopAllServices()
 				}
-
-			}
-			if logs {
+				if stopError != nil {
+					logError(stopError)
+				}
+				return nil
+			} else if logs {
+				var logsError error
 				if server {
-					return handleGetServiceLogs(c.SERVER, code, vim, nano)
+					logsError = handleGetServiceLogs(c.SERVER, code, vim, nano)
 				} else if scheduler {
-					return handleGetServiceLogs(c.SCHEDULER, code, vim, nano)
+					logsError = handleGetServiceLogs(c.SCHEDULER, code, vim, nano)
 				} else if bus {
-					return handleGetServiceLogs(c.TCP_BUS, code, vim, nano)
+					logsError = handleGetServiceLogs(c.TCP_BUS, code, vim, nano)
+				} else {
+					return fmt.Errorf("no flag provided")
 				}
-				return fmt.Errorf("please provide a valid service name e.g --server, --scheduler, --bus")
+				if logsError != nil {
+					logError(logsError)
+				}
+				return nil
 			}
-			return nil
+			return fmt.Errorf("no flag provided")
 		},
 	}
 	systemCMD.Flags().BoolVar(&server, "server", false, "manage server service")
@@ -487,21 +510,18 @@ func stopService(service c.Service) error {
 	pidPath := paths.PID_PATH(service)
 	exists, err := utils.PathExists(pidPath)
 	if err != nil {
-		log.Printf("error retrieving pidPath: %v\n", err)
-		return nil
+		return fmt.Errorf("error retrieving pidPath: %v", err)
 	}
 	if !exists {
-		log.Printf("pid path not found for service: %v\n", service)
-		return nil
+		return fmt.Errorf("pid path not found for service: %v", service)
 	}
 	PID, err := readPID(pidPath)
 	if err != nil {
-		log.Printf("error reading service PID: %v\n", err)
-		return nil
+		return fmt.Errorf("error reading service PID: %v", err)
 	}
 	err = syscall.Kill(PID, syscall.SIGINT)
 	if err != nil {
-		log.Printf("kill error: %v", err)
+		return fmt.Errorf("kill error: %v", err)
 	}
 	return nil
 }
@@ -512,7 +532,6 @@ func handleGetServiceLogs(service c.Service, code, vim, nano bool) error {
 		return handleGetLogs(path, code, vim, nano)
 	}
 	return fmt.Errorf("logs path for service %v not found", service)
-
 }
 
 func handleGetLogs(path string, code, vim, nano bool) error {
