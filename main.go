@@ -23,12 +23,12 @@ import (
 
 var cmdRepo *db.Repo
 
-// var serviceLogsMapping = map[c.Service]string{
-// 	c.HTTP:      paths.HTTP_SERVER_LOGS,
-// 	c.SCHEDULER: paths.SCHEDULER_LOGS,
-// 	c.CLEANER:   paths.CLEANER_LOGS,
-// 	c.TCP_BUS:   paths.TCP_BUS_LOGS,
-// }
+var serviceLogsMapping = map[c.Service]string{
+	c.SERVER:    paths.HTTP_SERVER_LOGS,
+	c.SCHEDULER: paths.SCHEDULER_LOGS,
+	c.CLEANER:   paths.CLEANER_LOGS,
+	c.TCP_BUS:   paths.TCP_BUS_LOGS,
+}
 
 var serviceRepos = map[c.Service]string{
 	c.SCHEDULER: "github.com/aodr3w/keiji-scheduler",
@@ -74,6 +74,7 @@ func init() {
 	}
 	rootCmd.AddCommand(NewInitCMD())
 	rootCmd.AddCommand(taskCMD())
+	rootCmd.AddCommand(NewSystemCMD())
 }
 
 func getTemplateRepoPath() (string, error) {
@@ -121,19 +122,19 @@ func createWorkSpace() error {
 	if err != nil {
 		return err
 	}
-	exists, err := utils.DirectoryExists(paths.TASKS_PATH)
+	exists, err := utils.PathExists(paths.TASKS_PATH)
 	if !exists || err != nil {
 		return cmdErrors.ErrWorkSpaceInit("work space creation error: path: %v exists: %v err: %v", paths.TASKS_PATH, exists, err)
 	}
-	exists, err = utils.DirectoryExists(paths.WORKSPACE)
+	exists, err = utils.PathExists(paths.WORKSPACE)
 	if !exists || err != nil {
 		return fmt.Errorf("work space creation error: path: %v exists: %v err: %v", paths.WORKSPACE, exists, err)
 	}
-	exists, err = utils.DirectoryExists(paths.WORKSPACE_SETTINGS)
+	exists, err = utils.PathExists(paths.WORKSPACE_SETTINGS)
 	if !exists || err != nil {
 		return fmt.Errorf("work space creation error: path: %v exists: %v err: %v", paths.WORKSPACE_SETTINGS, exists, err)
 	}
-	exists, err = utils.DirectoryExists(paths.WORKSPACE_MODULE)
+	exists, err = utils.PathExists(paths.WORKSPACE_MODULE)
 	if !exists || err != nil {
 		return fmt.Errorf("work space creation error: path: %v exists: %v err: %v", paths.WORKSPACE_MODULE, exists, err)
 	}
@@ -166,7 +167,7 @@ func isServiceInstalled(service c.Service) (string, bool) {
 		gopath = filepath.Join(homeDir, "go")
 	}
 	binPath := filepath.Join(gopath, "bin", fmt.Sprintf("%v-%v", "keiji", service))
-	ok, err := utils.DirectoryExists(binPath)
+	ok, err := utils.PathExists(binPath)
 	if err != nil {
 		log.Println(aurora.Red(fmt.Sprintf("%v", err)))
 	}
@@ -298,7 +299,7 @@ func taskCMD() *cobra.Command {
 func createTask(name string, description string, force bool) error {
 	//check if task exists
 	taskPath := filepath.Join(paths.TASKS_PATH, name)
-	exists, err := utils.DirectoryExists(taskPath)
+	exists, err := utils.PathExists(taskPath)
 	if err != nil {
 		return err
 	}
@@ -368,10 +369,11 @@ func getTask(name string) error {
 	return nil
 }
 
-func NewSystemCMD() {
+func NewSystemCMD() *cobra.Command {
 	//start stop update system services
 	var start, stop, logs bool
 	var server, scheduler, bus bool
+	var code, vim, nano bool
 	systemCMD := cobra.Command{
 		Use:   "system",
 		Short: "manage system services",
@@ -402,20 +404,27 @@ func NewSystemCMD() {
 			}
 			if logs {
 				if server {
-					return getServiceLogs(c.SERVER)
+					return handleGetServiceLogs(c.SERVER, code, vim, nano)
 				} else if scheduler {
-					return getServiceLogs(c.SCHEDULER)
+					return handleGetServiceLogs(c.SCHEDULER, code, vim, nano)
 				} else if bus {
-					return getServiceLogs(c.TCP_BUS)
+					return handleGetServiceLogs(c.TCP_BUS, code, vim, nano)
 				}
 				return fmt.Errorf("please provide a valid service name e.g --server, --scheduler, --bus")
 			}
 			return nil
 		},
 	}
+	systemCMD.Flags().BoolVar(&server, "server", false, "manage server service")
+	systemCMD.Flags().BoolVar(&scheduler, "scheduler", false, "manage scheduler service")
+	systemCMD.Flags().BoolVar(&bus, "bus", false, "manage tcp-bus service")
 	systemCMD.Flags().BoolVar(&start, "start", false, "starts system services")
 	systemCMD.Flags().BoolVar(&stop, "stop", false, "stops system services")
-	systemCMD.Flags().BoolVar(&logs, "logs", false, "opens service logs in editor")
+	systemCMD.Flags().BoolVar(&logs, "logs", false, "returns last 100 log lines for service")
+	systemCMD.Flags().BoolVar(&code, "code", false, "opens service logs in vscode")
+	systemCMD.Flags().BoolVar(&vim, "vim", false, "opens service logs in vim")
+	systemCMD.Flags().BoolVar(&nano, "nano", false, "opens service logs in nano")
+	return &systemCMD
 }
 
 func getServiceLogPath(service c.Service) (string, error) {
@@ -446,7 +455,7 @@ func startService(service c.Service) error {
 	return nil
 }
 func readPID(pidPath string) (int, error) {
-	exists, err := utils.DirectoryExists(filepath.Dir(pidPath))
+	exists, err := utils.PathExists(filepath.Dir(pidPath))
 
 	if err != nil {
 		return -1, err
@@ -474,11 +483,78 @@ func readPID(pidPath string) (int, error) {
 }
 func stopService(service c.Service) error {
 	//stop service using its pid
+	pidPath := paths.PID_PATH(service)
+	exists, err := utils.PathExists(pidPath)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf("pid path not found")
+	}
+	PID, err := readPID(pidPath)
+	if err != nil {
+		return err
+	}
+	err = runCMD(paths.WORKSPACE, false, "kill", "9", fmt.Sprintf("%d", PID))
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func getServiceLogs(service c.Service) error {
+func handleGetServiceLogs(service c.Service, code, vim, nano bool) error {
+	path := serviceLogsMapping[service]
+	if valid(path) {
+		return handleGetLogs(path, code, vim, nano)
+	}
+	return fmt.Errorf("logs path for service %v not found", service)
+
+}
+
+func handleGetLogs(path string, code, vim, nano bool) error {
+	var editor Editor
+	if code {
+		editor = CODE
+	}
+	if vim {
+		editor = VIM
+	}
+	if nano {
+		editor = NANO
+	}
+	if valid(editor) {
+		return OpenInEditor(editor, path)
+	}
+	logsLines, err := utils.GetLogLines(path)
+	if err != nil {
+		return err
+	}
+	for _, line := range logsLines.Content {
+		fmt.Println(line)
+	}
 	return nil
+}
+
+func OpenInEditor(editor Editor, path string) error {
+	var cmd *exec.Cmd
+
+	switch editor {
+	case VIM, NANO:
+		// Use osascript to open a new terminal window and run the editor
+		script := fmt.Sprintf(`tell application "Terminal"
+            do script "%s %s"
+            activate
+        end tell`, editor, path)
+		cmd = exec.Command("osascript", "-e", script)
+	case CODE:
+		cmd = exec.Command(string(editor), path)
+	default:
+		return fmt.Errorf("unsupported editor: %s", editor)
+	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
 
 func startAllServices() error {
@@ -499,31 +575,7 @@ func stopAllServices() error {
 	}
 	return nil
 }
-func getGoBinPath(service c.Service) (string, error) {
-	path := os.Getenv("GOBIN")
-	if !valid(path) {
-		path = os.Getenv("GOPATH")
-		if !valid(path) {
-			path = filepath.Join(os.Getenv("HOME"), "go", "bin")
-		} else {
-			path = filepath.Join(path, "bin")
-		}
-	}
-	//check that the path exists
-	exists, err := utils.DirectoryExists(path)
-	if err != nil {
-		return "", err
-	}
-	if !exists {
-		return "", fmt.Errorf("path %v does not exist", path)
-	}
-	//check for existence of service bin
-	serviceBin, ok := isServiceInstalled(service)
-	if !ok {
-		return "", fmt.Errorf("bin for service %s not found", service)
-	}
-	return serviceBin, nil
-}
+
 func valid(data interface{}) bool {
 	switch v := data.(type) {
 	case c.Service:
@@ -601,7 +653,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// if err := startService(c.SERVER); err != nil {
-	// 	log.Printf("error starting service %s, err: %v ", c.SERVER, err)
-	// }
 }
