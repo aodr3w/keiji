@@ -245,6 +245,19 @@ func NewInitCMD() *cobra.Command {
 					logError(fmt.Errorf("missing services %v", ms))
 				}
 			}
+
+			//init logfiles for service if not already present
+			for _, service := range c.SERVICES {
+				//initialize service logFile here
+				logPath, ok := serviceLogsMapping[service]
+				if !ok {
+					logError(fmt.Errorf("logPath not found for service %v", service))
+				}
+				_, err := logger.NewFileLogger(logPath)
+				if err != nil {
+					logError(err)
+				}
+			}
 			return nil
 		},
 	}
