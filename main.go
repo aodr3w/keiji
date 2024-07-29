@@ -27,7 +27,6 @@ var cmdRepo *db.Repo
 var serviceLogsMapping = map[c.Service]string{
 	c.SERVER:    paths.HTTP_SERVER_LOGS,
 	c.SCHEDULER: paths.SCHEDULER_LOGS,
-	c.CLEANER:   paths.CLEANER_LOGS,
 	c.TCP_BUS:   paths.TCP_BUS_LOGS,
 }
 
@@ -139,61 +138,57 @@ func createWorkSpace() error {
 	return nil
 }
 
-func allServicesInstalled() ([]c.Service, bool) {
-	missingServices := make([]c.Service, 0)
-	ok := true
-	for service := range serviceRepos {
-		if _, ok := isServiceInstalled(service); !ok {
-			log.Println(aurora.Red(fmt.Sprintf("service %s not found", service)))
-			missingServices = append(missingServices, service)
-			if ok {
-				ok = false
-			}
-		}
-	}
-	return missingServices, ok
-}
-
-func isServiceInstalled(service c.Service) (string, bool) {
+func isServiceInstalled(service c.Service) (error, bool) {
 	gopath := os.Getenv("GOPATH")
 	if !valid(gopath) {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
-			logError(err)
-			return "", false
+			return err, false
 		}
 		gopath = filepath.Join(homeDir, "go")
 	}
 	binPath := filepath.Join(gopath, "bin", fmt.Sprintf("%v-%v", "keiji", service))
 	ok, err := utils.PathExists(binPath)
 	if err != nil {
-		logError(err)
-		return "", false
+		return err, false
 	}
 
 	if !ok {
-		return "", false
+		return nil, false
 	}
 
-	return binPath, true
+	return nil, true
 }
 
 func InstallService(service c.Service, update bool) error {
+	err := runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
+	if err != nil {
+		return err
+	}
 	repoURL, ok := serviceRepos[service]
 	if !ok {
 		return fmt.Errorf("please provide repo url for %s", service)
 	}
-	if _, ok := isServiceInstalled(service); ok && !update {
+	err, ok = isServiceInstalled(service)
+	if err != nil {
+		return err
+	}
+	if ok && !update {
 		log.Println(
 			aurora.BrightGreen(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service)))
-	} else {
-		log.Println(aurora.Yellow(fmt.Sprintf("installing or updating service %s", service)))
-		err := runCMD(paths.WORKSPACE, true, "go", "install", fmt.Sprintf("%v@latest", repoURL))
+	}
+	log.Println(aurora.Yellow(fmt.Sprintf("installing or updating service %s", service)))
+	if update {
+		err := runCMD(paths.WORKSPACE, false, "go", "get", "-u", fmt.Sprintf("%v@latest", repoURL))
 		if err != nil {
 			return err
 		}
-
 	}
+	err = runCMD(paths.WORKSPACE, false, "go", "install", fmt.Sprintf("%v@latest", repoURL))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 func NewInitCMD() *cobra.Command {
@@ -225,15 +220,24 @@ func NewInitCMD() *cobra.Command {
 				}
 			}
 			//install services after initializing work space
-			ms, ok := allServicesInstalled()
-			if !ok {
-				//clear mod cache first
-				err := runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
+			missingServices := make([]c.Service, 0)
+			allInstalled := true
+			for service := range serviceRepos {
+				err, installed := isServiceInstalled(service)
 				if err != nil {
 					logError(err)
 					return nil
 				}
-				for _, s := range ms {
+				if !installed {
+					log.Println(aurora.Red(fmt.Sprintf("service %s not found", service)))
+					missingServices = append(missingServices, service)
+					if allInstalled {
+						allInstalled = false
+					}
+				}
+			}
+			if !allInstalled {
+				for _, s := range missingServices {
 					err := InstallService(s, false)
 					if err != nil {
 						logError(err)
@@ -241,8 +245,8 @@ func NewInitCMD() *cobra.Command {
 					}
 				}
 			} else {
-				if len(ms) > 0 {
-					logError(fmt.Errorf("missing services %v", ms))
+				if len(missingServices) > 0 {
+					logError(fmt.Errorf("missing services %v", missingServices))
 				}
 			}
 
@@ -263,9 +267,19 @@ func NewInitCMD() *cobra.Command {
 	}
 }
 
+func installAllServices(update bool) error {
+	for _, s := range c.SERVICES {
+		err := InstallService(s, update)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 func logError(err error) {
 	log.Println(aurora.Red(err))
 }
+
 func taskCMD() *cobra.Command {
 	var create, disable, delete, restart, get, force bool
 	var name, description string
@@ -397,7 +411,7 @@ func getTask(name string) error {
 
 func NewSystemCMD() *cobra.Command {
 	//start stop update system services
-	var start, stop, logs bool
+	var start, stop, logs, update bool
 	var server, scheduler, bus bool
 	var code, vim, nano bool
 	systemCMD := cobra.Command{
@@ -454,6 +468,21 @@ func NewSystemCMD() *cobra.Command {
 					logError(logsError)
 				}
 				return nil
+			} else if update {
+				var updateError error
+				if server {
+					updateError = InstallService(c.SERVER, update)
+				} else if scheduler {
+					updateError = InstallService(c.SCHEDULER, update)
+				} else if bus {
+					updateError = InstallService(c.TCP_BUS, update)
+				} else {
+					updateError = installAllServices(update)
+				}
+				if updateError != nil {
+					logError(updateError)
+				}
+				return nil
 			}
 			return fmt.Errorf("no flag provided")
 		},
@@ -467,6 +496,7 @@ func NewSystemCMD() *cobra.Command {
 	systemCMD.Flags().BoolVar(&code, "code", false, "opens service logs in vscode")
 	systemCMD.Flags().BoolVar(&vim, "vim", false, "opens service logs in vim")
 	systemCMD.Flags().BoolVar(&nano, "nano", false, "opens service logs in nano")
+	systemCMD.Flags().BoolVar(&update, "update", false, "updates service is specified otherwise all")
 	return &systemCMD
 }
 
