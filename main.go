@@ -165,6 +165,11 @@ func InstallService(service c.Service, update bool) error {
 	if err != nil {
 		return err
 	}
+
+	err = runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
+	if err != nil {
+		return err
+	}
 	repoURL, ok := serviceRepos[service]
 	if !ok {
 		return fmt.Errorf("please provide repo url for %s", service)
