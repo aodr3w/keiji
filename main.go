@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io/fs"
 	"log"
@@ -13,6 +14,7 @@ import (
 	"syscall"
 
 	cmdErrors "github.com/aodr3w/keiji-cli/errors"
+	"github.com/aodr3w/keiji-core/common"
 	c "github.com/aodr3w/keiji-core/constants"
 	"github.com/aodr3w/keiji-core/db"
 	"github.com/aodr3w/keiji-core/paths"
@@ -99,9 +101,9 @@ func getTemplateRepoPath(get bool) (string, error) {
 	}
 
 	//step 2: Locate the repository in the GoPATH
-	gopath := os.Getenv("GOPATH")
-	if gopath == "" {
-		gopath = filepath.Join(os.Getenv("HOME"), "go")
+	gopath, err := getGoPath()
+	if err != nil {
+		return "", err
 	}
 	repoPath := ""
 	filepath.Walk(filepath.Join(gopath, "pkg", "mod", "github.com", "aodr3w"),
@@ -164,31 +166,46 @@ func createWorkSpace() error {
 isService installed checks wether or not a service has been installed
 in the gopath
 */
-func isServiceInstalled(service c.Service) (error, bool) {
+func getGoPath() (string, error) {
 	gopath := os.Getenv("GOPATH")
 	if !valid(gopath) {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
-			return err, false
+			return "", err
 		}
 		gopath = filepath.Join(homeDir, "go")
 	}
-	binPath := filepath.Join(gopath, "bin", fmt.Sprintf("%v-%v", "keiji", service))
-	ok, err := utils.PathExists(binPath)
+	ok, err := utils.PathExists(gopath)
 	if err != nil {
-		return err, false
+		return "", err
 	}
-
 	if !ok {
-		return nil, false
+		return "", common.ErrPathNotFound(gopath)
 	}
-
-	return nil, true
+	return gopath, nil
+}
+func isServiceInstalled(service c.Service) (bool, error) {
+	_, err := getServicePath(service)
+	if err != nil {
+		if errors.Is(err, cmdErrors.ErrServiceNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 func InstallService(service c.Service, update bool) error {
+	ok, err := isServiceInstalled(service)
+	if err != nil {
+		return err
+	}
+	if ok && !update {
+		logWarn(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service))
+		return nil
+	}
 	logWarn("cleaning modcache...")
-	err := runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
+	err = runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
 	if err != nil {
 		return err
 	}
@@ -202,13 +219,7 @@ func InstallService(service c.Service, update bool) error {
 	if !ok {
 		return fmt.Errorf("please provide repo url for %s", service)
 	}
-	err, ok = isServiceInstalled(service)
-	if err != nil {
-		return err
-	}
-	if ok && !update {
-		logWarn(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service))
-	}
+
 	logWarn(fmt.Sprintf("installing or updating service %s", service))
 	if update {
 		err := runCMD(paths.WORKSPACE, true, "go", "get", "-u", fmt.Sprintf("%v@latest", repoURL))
@@ -254,7 +265,7 @@ func NewInitCMD() *cobra.Command {
 			missingServices := make([]c.Service, 0)
 			allInstalled := true
 			for service := range serviceRepos {
-				err, installed := isServiceInstalled(service)
+				installed, err := isServiceInstalled(service)
 				if err != nil {
 					logError(err)
 					return nil
@@ -308,6 +319,94 @@ func installAllServices(update bool) error {
 			return err
 		}
 	}
+	return nil
+}
+
+/*
+uninstalls specific service
+*/
+func uninstallService(service c.Service) error {
+	servicePath, err := getServicePath(service)
+	if err != nil {
+		return err
+	}
+	return os.RemoveAll(servicePath)
+}
+
+/*
+uninstall all keiji related packages
+*/
+func getPkgPath() (string, error) {
+	goPath, err := getGoPath()
+	if err != nil {
+		return "", err
+	}
+	pkgPath := filepath.Join(goPath, "pkg")
+	exists, err := utils.PathExists(pkgPath)
+	if err != nil {
+		return "", err
+	}
+	if !exists {
+		return "", common.ErrPathNotFound(pkgPath)
+	}
+	return pkgPath, nil
+}
+func getServicePath(service c.Service) (string, error) {
+	goPath, err := getGoPath()
+	if err != nil {
+		return "", err
+	}
+	binPath := filepath.Join(goPath, "bin", fmt.Sprintf("%v-%v", "keiji", service))
+	ok, err := utils.PathExists(binPath)
+	if err != nil {
+		return "", err
+	}
+	if !ok {
+		return "", cmdErrors.ErrServiceNotFound
+	}
+	return binPath, nil
+}
+func uninstallSystem() error {
+	//remove all services
+	for _, service := range c.SERVICES {
+		logWarn(fmt.Sprintf("uninstalling service %s", service))
+		err := uninstallService(service)
+		if err != nil {
+			if errors.Is(err, cmdErrors.ErrServiceNotFound) {
+				logError(err)
+				continue
+			}
+			return err
+		}
+	}
+	logInfo("services removed")
+	//delete workspace
+	logWarn("removing workspace")
+	// err := os.RemoveAll(paths.WORKSPACE)
+	// if err != nil {
+	// 	return err
+	// }
+	logInfo("workspace removed")
+	//delete packages
+	path, err := getPkgPath()
+	if err != nil {
+		return err
+	}
+	logWarn(fmt.Sprintf("removing path %s", path))
+	return nil
+}
+
+/*
+returns a boolean denoting wether a service is running or not
+*/
+func serviceIsRunning() bool {
+	return false
+}
+
+/*
+get status of all services installed or not, running or not
+*/
+func getStatus() error {
 	return nil
 }
 func logInfo(msg interface{}) {
@@ -452,7 +551,7 @@ func getTask(name string) error {
 
 func NewSystemCMD() *cobra.Command {
 	//start stop update system services
-	var start, stop, logs, update bool
+	var start, stop, logs, update, uninstall bool
 	var server, scheduler, bus bool
 	var code, vim, nano bool
 	systemCMD := cobra.Command{
@@ -524,6 +623,13 @@ func NewSystemCMD() *cobra.Command {
 					logError(updateError)
 				}
 				return nil
+			} else if uninstall {
+				//uninstalls all services
+				err := uninstallSystem()
+				if err != nil {
+					logError(err)
+				}
+				return nil
 			}
 			return fmt.Errorf("no flag provided")
 		},
@@ -538,6 +644,7 @@ func NewSystemCMD() *cobra.Command {
 	systemCMD.Flags().BoolVar(&vim, "vim", false, "opens service logs in vim")
 	systemCMD.Flags().BoolVar(&nano, "nano", false, "opens service logs in nano")
 	systemCMD.Flags().BoolVar(&update, "update", false, "updates service is specified otherwise all")
+	systemCMD.Flags().BoolVar(&uninstall, "uninstall", false, "uinstalls all services and packages")
 	return &systemCMD
 }
 
