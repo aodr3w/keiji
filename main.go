@@ -24,12 +24,14 @@ import (
 
 var cmdRepo *db.Repo
 
+// serviceLogsMapping is mapping of service to logsPath
 var serviceLogsMapping = map[c.Service]string{
 	c.SERVER:    paths.HTTP_SERVER_LOGS,
 	c.SCHEDULER: paths.SCHEDULER_LOGS,
 	c.TCP_BUS:   paths.TCP_BUS_LOGS,
 }
 
+// serviceRepos is a mapping of service to github repo
 var serviceRepos = map[c.Service]string{
 	c.SCHEDULER: "github.com/aodr3w/keiji-scheduler",
 	c.SERVER:    "github.com/aodr3w/keiji-server",
@@ -50,17 +52,26 @@ const (
 	CODE Editor = "code"
 )
 
-func getRepo() (*db.Repo, error) {
+/*
+newRepo is a factory function for repo instances.
+The caller of this function must remember to call instance.close()
+when done with the instance to prevent memory leaks
+*/
+func newRepo() (*db.Repo, error) {
 	return db.NewRepo()
 }
 
+/*
+check workSpace confirms wether or not a workspace folder
+has been successfully initialized by the user
+*/
 func checkWorkSpace() error {
 	var err error
 	if !utils.IsInit() {
 		return fmt.Errorf("please initialize your workspace to continue")
 	}
 	if cmdRepo == nil {
-		cmdRepo, err = getRepo()
+		cmdRepo, err = newRepo()
 	}
 	return err
 }
@@ -74,12 +85,19 @@ func init() {
 	rootCmd.AddCommand(NewSystemCMD())
 }
 
-func getTemplateRepoPath() (string, error) {
-	err := runCMD(paths.WORKSPACE, false, "go", "get", "-u", "github.com/aodr3w/keiji-core")
-	if err != nil {
-		fmt.Printf("Error pulling repository: %v\n", err)
-		return "", err
+/*
+getTemplateRepoPath returns a path and error.
+The path points to the location of the workspace templates
+*/
+func getTemplateRepoPath(get bool) (string, error) {
+	if get {
+		err := runCMD(paths.WORKSPACE, false, "go", "get", "-u", "github.com/aodr3w/keiji-core")
+		if err != nil {
+			fmt.Printf("Error pulling repository: %v\n", err)
+			return "", err
+		}
 	}
+
 	//step 2: Locate the repository in the GoPATH
 	gopath := os.Getenv("GOPATH")
 	if gopath == "" {
@@ -100,6 +118,10 @@ func getTemplateRepoPath() (string, error) {
 	}
 	return repoPath, nil
 }
+
+/*
+createWorkSpace function creates the workspace folder in the $HOME directory
+*/
 func createWorkSpace() error {
 	err := os.MkdirAll(paths.TASKS_PATH, 0755)
 	if err != nil {
@@ -110,7 +132,7 @@ func createWorkSpace() error {
 	if err != nil && !strings.Contains(err.Error(), "already exists") {
 		return err
 	}
-	repoPath, err := getTemplateRepoPath()
+	repoPath, err := getTemplateRepoPath(true)
 	if err != nil {
 		return err
 	}
@@ -138,6 +160,10 @@ func createWorkSpace() error {
 	return nil
 }
 
+/*
+isService installed checks wether or not a service has been installed
+in the gopath
+*/
 func isServiceInstalled(service c.Service) (error, bool) {
 	gopath := os.Getenv("GOPATH")
 	if !valid(gopath) {
@@ -161,12 +187,14 @@ func isServiceInstalled(service c.Service) (error, bool) {
 }
 
 func InstallService(service c.Service, update bool) error {
-	err := runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
+	logInfo("cleaning modcache...")
+	err := runCMD(paths.WORKSPACE, false, "go", "clean", "-modcache")
 	if err != nil {
 		return err
 	}
 
-	err = runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
+	logInfo("running go mod tidy...")
+	err = runCMD(paths.WORKSPACE, false, "go", "mod", "tidy")
 	if err != nil {
 		return err
 	}
@@ -174,15 +202,15 @@ func InstallService(service c.Service, update bool) error {
 	if !ok {
 		return fmt.Errorf("please provide repo url for %s", service)
 	}
+	logInfo(fmt.Sprintf("installing service %s", service))
 	err, ok = isServiceInstalled(service)
 	if err != nil {
 		return err
 	}
 	if ok && !update {
-		log.Println(
-			aurora.BrightGreen(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service)))
+		logWarn(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service))
 	}
-	log.Println(aurora.Yellow(fmt.Sprintf("installing or updating service %s", service)))
+	logInfo(fmt.Sprintf("installing or updating service %s", service))
 	if update {
 		err := runCMD(paths.WORKSPACE, false, "go", "get", "-u", fmt.Sprintf("%v@latest", repoURL))
 		if err != nil {
@@ -218,7 +246,7 @@ func NewInitCMD() *cobra.Command {
 					logError(err)
 					return nil
 				}
-				cmdRepo, err = getRepo()
+				cmdRepo, err = newRepo()
 				if err != nil {
 					logError(err)
 					return nil
@@ -281,6 +309,13 @@ func installAllServices(update bool) error {
 	}
 	return nil
 }
+func logInfo(msg string) {
+	log.Println(aurora.Green(msg))
+}
+func logWarn(msg string) {
+	log.Println(aurora.Yellow(msg))
+}
+
 func logError(err error) {
 	log.Println(aurora.Red(err))
 }
@@ -360,7 +395,7 @@ func createTask(name string, description string, force bool) error {
 	if err != nil {
 		return err
 	}
-	repoPath, err := getTemplateRepoPath()
+	repoPath, err := getTemplateRepoPath(false)
 	if err != nil {
 		return err
 	}
