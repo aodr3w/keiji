@@ -4,23 +4,6 @@ import (
 	"fmt"
 )
 
-type PathNotFound struct {
-	Message string
-}
-
-func (e *PathNotFound) Error() string {
-	return e.Message
-}
-func NewPathNotFound(path string) *PathNotFound {
-	return &PathNotFound{
-		fmt.Sprintf("path %v not found", path),
-	}
-}
-func Is(target error) bool {
-	_, ok := target.(*PathNotFound)
-	return ok
-}
-
 type ServiceNotFound struct {
 	Message string
 }
@@ -74,11 +57,6 @@ func (w *WorkSpaceInitError) Is(target error) bool {
 	return ok
 }
 
-var ErrPathNotFound = func(path string) *PathNotFound {
-	return NewPathNotFound(
-		path,
-	)
-}
 var ErrServiceNotFound = NewServiceNotFound()
 var ErrPIDNotFound = NewPIDNotFound()
 var ErrWorkSpaceInit = func(msg string, args ...interface{}) *WorkSpaceInitError {
