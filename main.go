@@ -91,7 +91,7 @@ The path points to the location of the workspace templates
 */
 func getTemplateRepoPath(get bool) (string, error) {
 	if get {
-		err := runCMD(paths.WORKSPACE, false, "go", "get", "-u", "github.com/aodr3w/keiji-core")
+		err := runCMD(paths.WORKSPACE, true, "go", "get", "-u", "github.com/aodr3w/keiji-core")
 		if err != nil {
 			fmt.Printf("Error pulling repository: %v\n", err)
 			return "", err
@@ -128,7 +128,7 @@ func createWorkSpace() error {
 		return err
 	}
 	//do a go mod init workspace
-	err = runCMD(paths.WORKSPACE, false, "go", "mod", "init", "workspace")
+	err = runCMD(paths.WORKSPACE, true, "go", "mod", "init", "workspace")
 	if err != nil && !strings.Contains(err.Error(), "already exists") {
 		return err
 	}
@@ -188,13 +188,13 @@ func isServiceInstalled(service c.Service) (error, bool) {
 
 func InstallService(service c.Service, update bool) error {
 	logWarn("cleaning modcache...")
-	err := runCMD(paths.WORKSPACE, false, "go", "clean", "-modcache")
+	err := runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
 	if err != nil {
 		return err
 	}
 
 	logWarn("running go mod tidy...")
-	err = runCMD(paths.WORKSPACE, false, "go", "mod", "tidy")
+	err = runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
 	if err != nil {
 		return err
 	}
@@ -211,12 +211,12 @@ func InstallService(service c.Service, update bool) error {
 	}
 	logWarn(fmt.Sprintf("installing or updating service %s", service))
 	if update {
-		err := runCMD(paths.WORKSPACE, false, "go", "get", "-u", fmt.Sprintf("%v@latest", repoURL))
+		err := runCMD(paths.WORKSPACE, true, "go", "get", "-u", fmt.Sprintf("%v@latest", repoURL))
 		if err != nil {
 			return err
 		}
 	}
-	err = runCMD(paths.WORKSPACE, false, "go", "install", fmt.Sprintf("%v@latest", repoURL))
+	err = runCMD(paths.WORKSPACE, true, "go", "install", fmt.Sprintf("%v@latest", repoURL))
 	if err != nil {
 		return err
 	}
@@ -224,9 +224,6 @@ func InstallService(service c.Service, update bool) error {
 	return nil
 }
 func NewInitCMD() *cobra.Command {
-	//TODO
-	/*add service installion to init process
-	 */
 	return &cobra.Command{
 		Use:   "init",
 		Short: "initialize workspace",
@@ -240,7 +237,7 @@ func NewInitCMD() *cobra.Command {
 					logError(err)
 					return nil
 				}
-				err = runCMD(paths.WORKSPACE, false, "go", "get", "github.com/aodr3w/keiji-tasks@latest")
+				err = runCMD(paths.WORKSPACE, true, "go", "get", "github.com/aodr3w/keiji-tasks@latest")
 				if err != nil {
 					logError(err)
 					return nil
@@ -419,7 +416,7 @@ func createTask(name string, description string, force bool) error {
 		} else {
 			log.Println(aurora.Green(fmt.Sprintf("%v copied", f)))
 		}
-		err := runCMD(paths.WORKSPACE, false, "go", "mod", "tidy")
+		err := runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
 		if err != nil {
 			return err
 		} else {
@@ -739,7 +736,8 @@ func runCMD(targetDir string, silence bool, ss ...string) error {
 	cmd := exec.Command(ss[0], ss[1:]...)
 	cmd.Dir = targetDir
 	output, err := cmd.CombinedOutput()
-	if !silence {
+	outputStr := string(output)
+	if !silence && len(outputStr) > 0 {
 		log.Printf("[runCMD]: %v\n", string(output))
 	}
 	if err != nil {
