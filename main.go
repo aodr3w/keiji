@@ -187,13 +187,13 @@ func isServiceInstalled(service c.Service) (error, bool) {
 }
 
 func InstallService(service c.Service, update bool) error {
-	logInfo("cleaning modcache...")
+	logWarn("cleaning modcache...")
 	err := runCMD(paths.WORKSPACE, false, "go", "clean", "-modcache")
 	if err != nil {
 		return err
 	}
 
-	logInfo("running go mod tidy...")
+	logWarn("running go mod tidy...")
 	err = runCMD(paths.WORKSPACE, false, "go", "mod", "tidy")
 	if err != nil {
 		return err
@@ -202,7 +202,6 @@ func InstallService(service c.Service, update bool) error {
 	if !ok {
 		return fmt.Errorf("please provide repo url for %s", service)
 	}
-	logInfo(fmt.Sprintf("installing service %s", service))
 	err, ok = isServiceInstalled(service)
 	if err != nil {
 		return err
@@ -210,7 +209,7 @@ func InstallService(service c.Service, update bool) error {
 	if ok && !update {
 		logWarn(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service))
 	}
-	logInfo(fmt.Sprintf("installing or updating service %s", service))
+	logWarn(fmt.Sprintf("installing or updating service %s", service))
 	if update {
 		err := runCMD(paths.WORKSPACE, false, "go", "get", "-u", fmt.Sprintf("%v@latest", repoURL))
 		if err != nil {
@@ -235,7 +234,7 @@ func NewInitCMD() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//initialize work space folder
 			if !utils.IsInit() {
-				log.Println(aurora.Yellow("Initializing work space..."))
+				logWarn("Initializing work space...")
 				err := createWorkSpace()
 				if err != nil {
 					logError(err)
@@ -251,6 +250,8 @@ func NewInitCMD() *cobra.Command {
 					logError(err)
 					return nil
 				}
+			} else {
+				logInfo("workspace already initialized.")
 			}
 			//install services after initializing work space
 			missingServices := make([]c.Service, 0)
@@ -262,11 +263,13 @@ func NewInitCMD() *cobra.Command {
 					return nil
 				}
 				if !installed {
-					log.Println(aurora.Red(fmt.Sprintf("service %s not found", service)))
+					logError(fmt.Sprintf("service %s not found", service))
 					missingServices = append(missingServices, service)
 					if allInstalled {
 						allInstalled = false
 					}
+				} else {
+					logInfo(fmt.Sprintf("service %s already installed", service))
 				}
 			}
 			if !allInstalled {
@@ -301,6 +304,7 @@ func NewInitCMD() *cobra.Command {
 }
 
 func installAllServices(update bool) error {
+	logWarn("installing all services...")
 	for _, s := range c.SERVICES {
 		err := InstallService(s, update)
 		if err != nil {
@@ -309,15 +313,15 @@ func installAllServices(update bool) error {
 	}
 	return nil
 }
-func logInfo(msg string) {
+func logInfo(msg interface{}) {
 	log.Println(aurora.Green(msg))
 }
-func logWarn(msg string) {
+func logWarn(msg interface{}) {
 	log.Println(aurora.Yellow(msg))
 }
 
-func logError(err error) {
-	log.Println(aurora.Red(err))
+func logError(msg interface{}) {
+	log.Println(aurora.Red(msg))
 }
 
 func taskCMD() *cobra.Command {
