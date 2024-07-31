@@ -85,7 +85,7 @@ func init() {
 		return nil
 	}
 	rootCmd.AddCommand(NewInitCMD())
-	rootCmd.AddCommand(taskCMD())
+	rootCmd.AddCommand(NewTaskCMD())
 	rootCmd.AddCommand(NewSystemCMD())
 }
 
@@ -494,7 +494,7 @@ func logError(msg interface{}) {
 	log.Println(aurora.Red(msg))
 }
 
-func taskCMD() *cobra.Command {
+func NewTaskCMD() *cobra.Command {
 	var create, build, disable, delete, restart, get, force, resolve bool
 	var logs, code, vim, nano bool
 	var name, description string
