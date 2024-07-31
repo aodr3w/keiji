@@ -341,7 +341,7 @@ func getPkgPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	pkgPath := filepath.Join(goPath, "pkg")
+	pkgPath := filepath.Join(goPath, "pkg", "mod", "github.com", "aodr3w")
 	exists, err := utils.PathExists(pkgPath)
 	if err != nil {
 		return "", err
@@ -367,6 +367,10 @@ func getServicePath(service c.Service) (string, error) {
 	return binPath, nil
 }
 func uninstallSystem() error {
+	//confirm use of sudo priviledges
+	if os.Geteuid() != 0 {
+		return fmt.Errorf("this command must be run as root. Please use sudo")
+	}
 	//remove all services
 	for _, service := range c.SERVICES {
 		logWarn(fmt.Sprintf("uninstalling service %s", service))
@@ -379,21 +383,42 @@ func uninstallSystem() error {
 			return err
 		}
 	}
-	logInfo("services removed")
 	//delete workspace
 	logWarn("removing workspace")
-	// err := os.RemoveAll(paths.WORKSPACE)
-	// if err != nil {
-	// 	return err
-	// }
-	logInfo("workspace removed")
+	if err := os.RemoveAll(paths.WORKSPACE); err != nil {
+		return err
+	}
+
+	//deleting hidden folders
+	logWarn("deleting system folder")
+	if err := os.RemoveAll(paths.SYSTEM_ROOT); err != nil {
+		return err
+	}
 	//delete packages
 	path, err := getPkgPath()
 	if err != nil {
 		return err
 	}
-	logWarn(fmt.Sprintf("removing path %s", path))
-	return nil
+	err = filepath.WalkDir(path, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			if strings.Contains(err.Error(), "no such file or directory") {
+				return nil
+			}
+			return err
+		}
+		if d.IsDir() && strings.Contains(d.Name(), "keiji") || strings.Contains(d.Name(), "logger") {
+			//delete the dir
+			//call os.RemoveAll() here
+			logWarn(fmt.Sprintf("deleting %v", d.Name()))
+			removeErr := os.RemoveAll(path)
+			if removeErr != nil {
+				return removeErr
+			}
+		}
+		return nil
+	})
+
+	return err
 }
 
 /*
@@ -559,6 +584,15 @@ func NewSystemCMD() *cobra.Command {
 		Short: "manage system services",
 		Long:  "commands start, stop and diagnose system services",
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			if uninstall {
+				//uninstalls all services
+				err := uninstallSystem()
+				if err != nil {
+					logError(err)
+				}
+				return nil
+			}
 			if err := checkWorkSpace(); err != nil {
 				logError(err)
 				return nil
@@ -621,13 +655,6 @@ func NewSystemCMD() *cobra.Command {
 				}
 				if updateError != nil {
 					logError(updateError)
-				}
-				return nil
-			} else if uninstall {
-				//uninstalls all services
-				err := uninstallSystem()
-				if err != nil {
-					logError(err)
 				}
 				return nil
 			}
