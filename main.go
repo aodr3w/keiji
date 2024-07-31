@@ -13,6 +13,7 @@ import (
 	"strings"
 	"syscall"
 
+	busclient "github.com/aodr3w/keiji-bus-client/client"
 	cmdErrors "github.com/aodr3w/keiji-cli/errors"
 	"github.com/aodr3w/keiji-core/common"
 	c "github.com/aodr3w/keiji-core/constants"
@@ -24,6 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var bc = busclient.NewBusClient()
 var cmdRepo *db.Repo
 
 // serviceLogsMapping is mapping of service to logsPath
@@ -600,16 +602,30 @@ func createTask(name string, description string, force bool) error {
 
 func disableTask(name string) error {
 	log.Printf("disabling task %v\n", name)
-	return nil
+	//send disable signal to tcp-bus
+	task, err := cmdRepo.GetTaskByName(name)
+	if err != nil {
+		return err
+	}
+	return bc.StopTask(task.TaskId, true, false)
 }
 
 func deleteTask(name string) error {
 	log.Printf("deleting task %v\n", name)
-	return nil
+	task, err := cmdRepo.GetTaskByName(name)
+	if err != nil {
+		return err
+	}
+	return bc.StopTask(task.TaskId, false, true)
 }
+
 func restartTask(name string) error {
 	log.Printf("restarting task %v\n", name)
-	return nil
+	task, err := cmdRepo.GetTaskByName(name)
+	if err != nil {
+		return err
+	}
+	return bc.StopTask(task.TaskId, false, false)
 }
 
 func getTask(name string) error {

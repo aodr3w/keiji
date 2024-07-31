@@ -3,7 +3,7 @@ module github.com/aodr3w/keiji-cli
 go 1.22.5
 
 require (
-	github.com/aodr3w/keiji-core v0.0.0-20240731121012-a214d4343fe6
+	github.com/aodr3w/keiji-bus-client v0.0.0-20240731150430-f0f54f987d6d
 	github.com/spf13/cobra v1.8.1
 )
 
@@ -25,6 +25,7 @@ require (
 )
 
 require (
+	github.com/aodr3w/keiji-core v0.0.0-20240731121012-a214d4343fe6
 	github.com/aodr3w/logger v0.0.0-20240718094903-5071dde6db05
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible
