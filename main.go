@@ -495,7 +495,8 @@ func logError(msg interface{}) {
 }
 
 func taskCMD() *cobra.Command {
-	var create, build, disable, delete, restart, get, force bool
+	var create, build, disable, delete, restart, get, force, resolve bool
+	var logs, code, vim, nano bool
 	var name, description string
 	taskCMD := cobra.Command{
 		Use:   "task",
@@ -527,6 +528,10 @@ func taskCMD() *cobra.Command {
 				taskError = restartTask(name)
 			} else if build {
 				taskError = buildTask(name)
+			} else if resolve {
+				taskError = resolveError(name)
+			} else if logs {
+				taskError = handleGetTaskLogs(name, code, vim, nano)
 			} else {
 				return fmt.Errorf("please pass a valid command")
 			}
@@ -545,6 +550,11 @@ func taskCMD() *cobra.Command {
 	taskCMD.Flags().BoolVar(&get, "get", false, "provid true to get task info (returns all tasks if name not provided)")
 	taskCMD.Flags().BoolVar(&force, "force", false, "provid true to force createTask operation")
 	taskCMD.Flags().BoolVar(&build, "build", false, "provide true to rebuild task executable")
+	taskCMD.Flags().BoolVar(&resolve, "resolve", false, "provide true to resolve task.isError")
+	taskCMD.Flags().BoolVar(&logs, "logs", false, "returns last 100 log lines for service")
+	taskCMD.Flags().BoolVar(&code, "code", false, "opens service logs in vscode")
+	taskCMD.Flags().BoolVar(&vim, "vim", false, "opens service logs in vim")
+	taskCMD.Flags().BoolVar(&nano, "nano", false, "opens service logs in nano")
 	return &taskCMD
 }
 func createTask(name string, description string, force bool) error {
@@ -629,6 +639,12 @@ func restartTask(name string) error {
 		return err
 	}
 	return bc.StopTask(task.TaskId, false, false)
+}
+
+func resolveError(name string) error {
+	model, err := cmdRepo.SetIsError(name, false, "")
+	log.Printf("resolved : %v, %v\n", model, err)
+	return err
 }
 
 func getTask(name string) error {
@@ -833,6 +849,13 @@ func stopService(service c.Service) error {
 	return nil
 }
 
+func handleGetTaskLogs(name string, code, vim, nano bool) error {
+	task, err := cmdRepo.GetTaskByName(name)
+	if err != nil {
+		return err
+	}
+	return handleGetLogs(task.LogPath, code, vim, nano)
+}
 func handleGetServiceLogs(service c.Service, code, vim, nano bool) error {
 	path := serviceLogsMapping[service]
 	if valid(path) {
