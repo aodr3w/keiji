@@ -222,19 +222,17 @@ func InstallService(service c.Service, update bool) error {
 		return fmt.Errorf("please provide repo url for %s", service)
 	}
 
-	logWarn(fmt.Sprintf("installing or updating service %s", service))
-	if update {
-		err := runCMD(paths.WORKSPACE, true, "go", "get", "-u", fmt.Sprintf("%v@main", repoURL))
-		if err != nil {
-			return err
-		}
-	}
 	err = runCMD(paths.WORKSPACE, true, "go", "install", fmt.Sprintf("%v@main", repoURL))
 	if err != nil {
 		return err
 	}
 
-	return nil
+	if !update {
+		return nil
+	} else {
+		return restartService(service)
+	}
+
 }
 func NewInitCMD() *cobra.Command {
 	return &cobra.Command{
@@ -827,6 +825,13 @@ func readPID(pidPath string) (int, error) {
 	}
 
 	return pid, nil
+}
+func restartService(service c.Service) error {
+	err := stopService(service)
+	if err != nil {
+		return err
+	}
+	return startService(service)
 }
 func stopService(service c.Service) error {
 	//stop service using its pid
