@@ -522,10 +522,8 @@ func NewTaskCMD() *cobra.Command {
 				taskError = getTask(name)
 			} else if delete {
 				taskError = deleteTask(name)
-			} else if restart {
-				taskError = restartTask(name)
 			} else if build {
-				taskError = buildTask(name)
+				taskError = buildTask(name, restart)
 			} else if resolve {
 				taskError = resolveError(name)
 			} else if logs {
@@ -631,7 +629,7 @@ func deleteTask(name string) error {
 }
 
 func restartTask(name string) error {
-	log.Printf("restarting task %v\n", name)
+	logWarn(fmt.Sprintf("restarting task %v\n", name))
 	task, err := cmdRepo.GetTaskByName(name)
 	if err != nil {
 		return err
@@ -654,7 +652,7 @@ func getTask(name string) error {
 	return nil
 }
 
-func buildTask(name string) error {
+func buildTask(name string, restart bool) error {
 	taskPath := filepath.Join(paths.TASKS_PATH, name)
 	exists, err := utils.PathExists(taskPath)
 	if err != nil {
@@ -665,7 +663,14 @@ func buildTask(name string) error {
 		return common.ErrPathNotFound(taskPath)
 	}
 	//run schedule/main.go
-	return runCMD(taskPath, false, "go", "run", filepath.Join(taskPath, "schedule", "main.go"))
+	err = runCMD(taskPath, false, "go", "run", filepath.Join(taskPath, "schedule", "main.go"))
+	if err != nil {
+		return err
+	}
+	if restart {
+		return restartTask(name)
+	}
+	return nil
 }
 
 func NewSystemCMD() *cobra.Command {
