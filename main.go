@@ -222,12 +222,12 @@ func InstallService(service c.Service, update bool) error {
 
 	logWarn(fmt.Sprintf("installing or updating service %s", service))
 	if update {
-		err := runCMD(paths.WORKSPACE, true, "go", "get", "-u", fmt.Sprintf("%v@latest", repoURL))
+		err := runCMD(paths.WORKSPACE, true, "go", "get", "-u", fmt.Sprintf("%v@main", repoURL))
 		if err != nil {
 			return err
 		}
 	}
-	err = runCMD(paths.WORKSPACE, true, "go", "install", fmt.Sprintf("%v@latest", repoURL))
+	err = runCMD(paths.WORKSPACE, true, "go", "install", fmt.Sprintf("%v@main", repoURL))
 	if err != nil {
 		return err
 	}
@@ -248,7 +248,7 @@ func NewInitCMD() *cobra.Command {
 					logError(err)
 					return nil
 				}
-				err = runCMD(paths.WORKSPACE, true, "go", "get", "github.com/aodr3w/keiji-tasks@latest")
+				err = runCMD(paths.WORKSPACE, true, "go", "get", "github.com/aodr3w/keiji-tasks@main")
 				if err != nil {
 					logError(err)
 					return nil
@@ -424,15 +424,62 @@ func uninstallSystem() error {
 /*
 returns a boolean denoting wether a service is running or not
 */
-func serviceIsRunning() bool {
-	return false
+func isServiceRunning(service c.Service) bool {
+	pidPath := paths.PID_PATH(service)
+	pid, err := readPID(pidPath)
+	if err != nil {
+		logError(err)
+		return false
+	}
+	err = syscall.Kill(pid, 0)
+	if err != nil {
+		if err == syscall.ESRCH {
+			logError(fmt.Sprintf("process with PID %d does not exist", pid))
+			return false
+		} else if err == syscall.EPERM {
+			logError("permission denied")
+			return false
+		}
+		logError(err)
+		return false
+	}
+	return true
 }
 
 /*
 get status of all services installed or not, running or not
 */
-func getStatus() error {
-	return nil
+func getServiceInfo() {
+	report := make(map[c.Service]c.ServiceStatus)
+	for _, service := range c.SERVICES {
+		ok, err := isServiceInstalled(service)
+		if err != nil {
+			logError(err)
+			continue
+		}
+		if !ok {
+			logError(fmt.Sprintf("service %s not found", service))
+			continue
+		}
+		ok = isServiceRunning(service)
+		if ok {
+			report[service] = c.ONLINE
+		} else {
+			report[service] = c.OFFLINE
+		}
+	}
+
+	// Print header
+	fmt.Println(strings.Repeat("=", 8), "SERVICES", strings.Repeat("=", 8))
+	fmt.Printf("%-18s %-18s\n", "NAME", "STATUS")
+
+	// Print each service status
+	for k, v := range report {
+		fmt.Printf("%-18s %-18s\n", k, v)
+	}
+
+	// Print footer
+	fmt.Println(strings.Repeat("=", 8), "SERVICES", strings.Repeat("=", 8))
 }
 func logInfo(msg interface{}) {
 	log.Println(aurora.Green(msg))
@@ -577,7 +624,7 @@ func getTask(name string) error {
 func NewSystemCMD() *cobra.Command {
 	//start stop update system services
 	var start, stop, logs, update, uninstall bool
-	var server, scheduler, bus bool
+	var server, scheduler, bus, status bool
 	var code, vim, nano bool
 	systemCMD := cobra.Command{
 		Use:   "system",
@@ -657,6 +704,8 @@ func NewSystemCMD() *cobra.Command {
 					logError(updateError)
 				}
 				return nil
+			} else if status {
+				getServiceInfo()
 			}
 			return fmt.Errorf("no flag provided")
 		},
@@ -672,6 +721,7 @@ func NewSystemCMD() *cobra.Command {
 	systemCMD.Flags().BoolVar(&nano, "nano", false, "opens service logs in nano")
 	systemCMD.Flags().BoolVar(&update, "update", false, "updates service is specified otherwise all")
 	systemCMD.Flags().BoolVar(&uninstall, "uninstall", false, "uinstalls all services and packages")
+	systemCMD.Flags().BoolVar(&status, "status", false, "get status of system services")
 	return &systemCMD
 }
 
