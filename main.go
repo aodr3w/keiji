@@ -495,7 +495,7 @@ func logError(msg interface{}) {
 }
 
 func taskCMD() *cobra.Command {
-	var create, disable, delete, restart, get, force bool
+	var create, build, disable, delete, restart, get, force bool
 	var name, description string
 	taskCMD := cobra.Command{
 		Use:   "task",
@@ -525,6 +525,8 @@ func taskCMD() *cobra.Command {
 				taskError = deleteTask(name)
 			} else if restart {
 				taskError = restartTask(name)
+			} else if build {
+				taskError = buildTask(name)
 			} else {
 				return fmt.Errorf("please pass a valid command")
 			}
@@ -542,6 +544,7 @@ func taskCMD() *cobra.Command {
 	taskCMD.Flags().BoolVar(&restart, "restart", false, "provide true to restart task")
 	taskCMD.Flags().BoolVar(&get, "get", false, "provid true to get task info (returns all tasks if name not provided)")
 	taskCMD.Flags().BoolVar(&force, "force", false, "provid true to force createTask operation")
+	taskCMD.Flags().BoolVar(&build, "build", false, "provide true to rebuild task executable")
 	return &taskCMD
 }
 func createTask(name string, description string, force bool) error {
@@ -635,6 +638,20 @@ func getTask(name string) error {
 		log.Printf("getting all tasks..")
 	}
 	return nil
+}
+
+func buildTask(name string) error {
+	taskPath := filepath.Join(paths.TASKS_PATH, name)
+	exists, err := utils.PathExists(taskPath)
+	if err != nil {
+		return err
+	}
+	logInfo("task found , building...")
+	if !exists {
+		return common.ErrPathNotFound(taskPath)
+	}
+	//run schedule/main.go
+	return runCMD(taskPath, false, "go", "run", filepath.Join(taskPath, "schedule", "main.go"))
 }
 
 func NewSystemCMD() *cobra.Command {
