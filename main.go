@@ -276,8 +276,6 @@ func NewInitCMD() *cobra.Command {
 					if allInstalled {
 						allInstalled = false
 					}
-				} else {
-					logInfo(fmt.Sprintf("service %s already installed", service))
 				}
 			}
 			if !allInstalled {
