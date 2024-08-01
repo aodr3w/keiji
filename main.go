@@ -595,16 +595,13 @@ func createTask(name string, description string, force bool) error {
 		)
 		if err != nil {
 			return err
-		} else {
-			log.Println(aurora.Green(fmt.Sprintf("%v copied", f)))
 		}
 		err := runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
 		if err != nil {
 			return err
-		} else {
-			log.Println(aurora.Green(fmt.Sprintln("task created")))
 		}
 	}
+	log.Println(aurora.Green(fmt.Sprintln("task created")))
 
 	return writeEnvFile(taskPath, name, description)
 }
