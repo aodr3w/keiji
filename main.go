@@ -580,28 +580,27 @@ func createTask(name string, description string, force bool) error {
 	if err != nil {
 		return err
 	}
-	log.Println("copying template files")
-	for _, f := range []string{"function", "schedule"} {
-		dstPath := filepath.Join(taskPath, f)
-		err = os.MkdirAll(dstPath, 0755)
-		if err != nil {
-			return err
+	//create destination folder
+	err = filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+		if d.Name() == "tasks" {
+			return utils.CopyDir(filepath.Join(path), taskPath)
 		}
-		err = utils.CopyFile(
-			filepath.Join(repoPath, "templates", "tasks", fmt.Sprintf("%v/main.go", f)),
-			fmt.Sprintf("%v/main.go", dstPath),
-		)
-		if err != nil {
-			return err
-		}
-		err := runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
-		if err != nil {
-			return err
-		}
+		return nil
+	})
+	if err != nil {
+		return err
 	}
-	log.Println(aurora.Green(fmt.Sprintln("task created")))
 
-	return writeEnvFile(taskPath, name, description)
+	err = runCMD(paths.WORKSPACE, false, "go", "mod", "tidy")
+	if err != nil {
+		return err
+	}
+	err = writeEnvFile(taskPath, name, description)
+	if err != nil {
+		return err
+	}
+	log.Println(aurora.Green("task created"))
+	return nil
 }
 
 func disableTask(name string) error {
