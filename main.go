@@ -30,7 +30,6 @@ var cmdRepo *db.Repo
 
 // serviceLogsMapping is mapping of service to logsPath
 var serviceLogsMapping = map[c.Service]string{
-	c.SERVER:    paths.HTTP_SERVER_LOGS,
 	c.SCHEDULER: paths.SCHEDULER_LOGS,
 	c.TCP_BUS:   paths.TCP_BUS_LOGS,
 }
@@ -38,7 +37,6 @@ var serviceLogsMapping = map[c.Service]string{
 // serviceRepos is a mapping of service to github repo
 var serviceRepos = map[c.Service]string{
 	c.SCHEDULER: "github.com/aodr3w/keiji-scheduler",
-	c.SERVER:    "github.com/aodr3w/keiji-server",
 	c.TCP_BUS:   "github.com/aodr3w/keiji-bus",
 }
 
@@ -692,9 +690,7 @@ func NewSystemCMD() *cobra.Command {
 			}
 			if start {
 				var startError error
-				if server {
-					startError = startService(c.SERVER)
-				} else if scheduler {
+				if scheduler {
 					startError = startService(c.SCHEDULER)
 				} else if bus {
 					startError = startService(c.TCP_BUS)
@@ -707,9 +703,7 @@ func NewSystemCMD() *cobra.Command {
 				return nil
 			} else if stop {
 				var stopError error
-				if server {
-					stopError = stopService(c.SERVER)
-				} else if scheduler {
+				if scheduler {
 					stopError = stopService(c.SCHEDULER)
 				} else if bus {
 					stopError = stopService(c.TCP_BUS)
@@ -722,9 +716,7 @@ func NewSystemCMD() *cobra.Command {
 				return nil
 			} else if logs {
 				var logsError error
-				if server {
-					logsError = handleGetServiceLogs(c.SERVER, code, vim, nano)
-				} else if scheduler {
+				if scheduler {
 					logsError = handleGetServiceLogs(c.SCHEDULER, code, vim, nano)
 				} else if bus {
 					logsError = handleGetServiceLogs(c.TCP_BUS, code, vim, nano)
@@ -737,9 +729,7 @@ func NewSystemCMD() *cobra.Command {
 				return nil
 			} else if update {
 				var updateError error
-				if server {
-					updateError = InstallService(c.SERVER, update)
-				} else if scheduler {
+				if scheduler {
 					updateError = InstallService(c.SCHEDULER, update)
 				} else if bus {
 					updateError = InstallService(c.TCP_BUS, update)
@@ -755,9 +745,7 @@ func NewSystemCMD() *cobra.Command {
 				return nil
 			} else if restart {
 				var restartError error
-				if server {
-					restartError = restartService(c.SERVER)
-				} else if scheduler {
+				if scheduler {
 					restartError = restartService(c.SCHEDULER)
 				} else if bus {
 					restartError = restartService(c.TCP_BUS)
@@ -790,8 +778,6 @@ func NewSystemCMD() *cobra.Command {
 
 func getServiceLogPath(service c.Service) (string, error) {
 	switch service {
-	case c.SERVER:
-		return paths.HTTP_SERVER_LOGS, nil
 	case c.SCHEDULER:
 		return paths.SCHEDULER_LOGS, nil
 	case c.TCP_BUS:
