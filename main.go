@@ -752,6 +752,7 @@ func NewSystemCMD() *cobra.Command {
 				return nil
 			} else if status {
 				getServiceInfo()
+				return nil
 			}
 			return fmt.Errorf("no flag provided")
 		},
