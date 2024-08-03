@@ -995,8 +995,8 @@ func runCMD(targetDir string, silence bool, ss ...string) error {
 	cmd.Dir = targetDir
 	output, err := cmd.CombinedOutput()
 	outputStr := string(output)
-	if !silence && len(outputStr) > 0 {
-		log.Printf("[runCMD]: %v\n", string(output))
+	if !silence && len(strings.Trim(outputStr, "")) > 0 {
+		fmt.Println(string(output))
 	}
 	if err != nil {
 		return fmt.Errorf("failed to run go command: %v , output: %s", err, string(output))
