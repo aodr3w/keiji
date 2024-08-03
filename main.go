@@ -670,7 +670,7 @@ func buildTask(name string, restart bool) error {
 func NewSystemCMD() *cobra.Command {
 	//start stop update system services
 	var start, stop, logs, update, uninstall bool
-	var server, scheduler, bus, status bool
+	var server, scheduler, bus, status, restart bool
 	var code, vim, nano bool
 	systemCMD := cobra.Command{
 		Use:   "system",
@@ -753,6 +753,21 @@ func NewSystemCMD() *cobra.Command {
 			} else if status {
 				getServiceInfo()
 				return nil
+			} else if restart {
+				var restartError error
+				if server {
+					restartError = restartService(c.SERVER)
+				} else if scheduler {
+					restartError = restartService(c.SCHEDULER)
+				} else if bus {
+					restartError = restartService(c.TCP_BUS)
+				} else {
+					restartError = restartAllServices()
+				}
+				if restartError != nil {
+					logError(restartError)
+				}
+				return nil
 			}
 			return fmt.Errorf("no flag provided")
 		},
@@ -769,6 +784,7 @@ func NewSystemCMD() *cobra.Command {
 	systemCMD.Flags().BoolVar(&update, "update", false, "updates service is specified otherwise all")
 	systemCMD.Flags().BoolVar(&uninstall, "uninstall", false, "uinstalls all services and packages")
 	systemCMD.Flags().BoolVar(&status, "status", false, "get status of system services")
+	systemCMD.Flags().BoolVar(&restart, "restart", false, "restart all services")
 	return &systemCMD
 }
 
@@ -825,6 +841,17 @@ func readPID(pidPath string) (int, error) {
 	}
 
 	return pid, nil
+}
+func restartAllServices() error {
+	logWarn("restarting all services")
+	for _, service := range c.SERVICES {
+		err := restartService(service)
+		if err != nil {
+			return err
+		}
+	}
+	logInfo("ok")
+	return nil
 }
 func restartService(service c.Service) error {
 	err := stopService(service)
