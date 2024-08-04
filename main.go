@@ -666,8 +666,7 @@ func buildTask(name string, restart bool) error {
 		return common.ErrPathNotFound(taskPath)
 	}
 	logInfo("task found , building...")
-	//run schedule/main.go
-	err = runCMD(taskPath, false, "go", "run", filepath.Join(taskPath, "schedule", "main.go"))
+	err = runCMD(taskPath, false, "go", "run", "main.go", "schedule.go", "function.go", "--schedule")
 	if err != nil {
 		return err
 	}
