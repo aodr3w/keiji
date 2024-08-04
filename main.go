@@ -431,7 +431,6 @@ func isServiceRunning(service c.Service) bool {
 	pidPath := paths.PID_PATH(service)
 	pid, err := readPID(pidPath)
 	if err != nil {
-		logError(err)
 		return false
 	}
 	err = syscall.Kill(pid, 0)
@@ -505,10 +504,12 @@ func NewTaskCMD() *cobra.Command {
 		Long:  "cobra commands to create, update, deploy, or delete tasks",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var taskError error
+			log.Println("checking workspace..")
 			if err := checkWorkSpace(); err != nil {
 				logError(err)
 				return nil
 			}
+			log.Println("WORKSPACE IS FINE...")
 			if !valid(name) {
 				logError(fmt.Errorf("please provide name for your task"))
 				return nil
@@ -817,7 +818,7 @@ func readPID(pidPath string) (int, error) {
 	}
 
 	if !exists {
-		return -1, fmt.Errorf("pid path not found")
+		return -1, cmdErrors.ErrPIDNotFound
 	}
 	f, err := os.Open(pidPath)
 	if err != nil {
