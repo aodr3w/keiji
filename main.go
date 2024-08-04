@@ -509,7 +509,6 @@ func NewTaskCMD() *cobra.Command {
 				logError(err)
 				return nil
 			}
-			log.Println("WORKSPACE IS FINE...")
 			if !valid(name) {
 				logError(fmt.Errorf("please provide name for your task"))
 				return nil
