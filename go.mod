@@ -25,7 +25,7 @@ require (
 )
 
 require (
-	github.com/aodr3w/keiji-core v0.0.0-20240804142543-e75fb9320b85
+	github.com/aodr3w/keiji-core v0.0.0-20240804171551-060228bc2cbe
 	github.com/aodr3w/logger v0.0.0-20240718094903-5071dde6db05
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible
