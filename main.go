@@ -195,7 +195,7 @@ func isServiceInstalled(service c.Service) (bool, error) {
 	return true, nil
 }
 
-func InstallService(service c.Service, update bool) error {
+func InstallService(service c.Service, update bool, cc bool) error {
 	ok, err := isServiceInstalled(service)
 	if err != nil {
 		return err
@@ -204,17 +204,14 @@ func InstallService(service c.Service, update bool) error {
 		logWarn(fmt.Sprintf("service %s is already installed, provide updated=true to update service\n", service))
 		return nil
 	}
-	logWarn("cleaning modcache...")
-	err = runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
-	if err != nil {
-		return err
+	if cc {
+		logWarn("cleaning modcache...")
+		err = runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
+		if err != nil {
+			return err
+		}
 	}
 
-	logWarn("running go mod tidy...")
-	err = runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
-	if err != nil {
-		return err
-	}
 	repoURL, ok := serviceRepos[service]
 	if !ok {
 		return fmt.Errorf("please provide repo url for %s", service)
@@ -278,7 +275,7 @@ func NewInitCMD() *cobra.Command {
 			}
 			if !allInstalled {
 				for _, s := range missingServices {
-					err := InstallService(s, false)
+					err := InstallService(s, false, false)
 					if err != nil {
 						logError(err)
 						return nil
@@ -307,15 +304,25 @@ func NewInitCMD() *cobra.Command {
 	}
 }
 
-func installAllServices(update bool) error {
+func installAllServices(update bool, cc bool) error {
+	if cc {
+		err := clearCache()
+		if err != nil {
+			return err
+		}
+	}
 	logWarn("installing all services...")
 	for _, s := range c.SERVICES {
-		err := InstallService(s, update)
+		err := InstallService(s, update, false)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+func clearCache() error {
+	logWarn("cleaning modcache...")
+	return runCMD(paths.WORKSPACE, true, "go", "clean", "-modcache")
 }
 
 /*
@@ -589,7 +596,7 @@ func createTask(name string, description string, force bool) error {
 		return err
 	}
 
-	err = runCMD(paths.WORKSPACE, false, "go", "mod", "tidy")
+	err = runCMD(paths.WORKSPACE, false, "go", "get", "-u", "github.com/aodr3w/keiji-tasks@main")
 	if err != nil {
 		return err
 	}
@@ -667,7 +674,7 @@ func buildTask(name string, restart bool) error {
 
 func NewSystemCMD() *cobra.Command {
 	//start stop update system services
-	var start, stop, logs, update, uninstall bool
+	var start, stop, logs, update, uninstall, cc bool
 	var server, scheduler, bus, status, restart bool
 	var code, vim, nano bool
 	systemCMD := cobra.Command{
@@ -730,11 +737,11 @@ func NewSystemCMD() *cobra.Command {
 			} else if update {
 				var updateError error
 				if scheduler {
-					updateError = InstallService(c.SCHEDULER, update)
+					updateError = InstallService(c.SCHEDULER, update, cc)
 				} else if bus {
-					updateError = InstallService(c.TCP_BUS, update)
+					updateError = InstallService(c.TCP_BUS, update, cc)
 				} else {
-					updateError = installAllServices(update)
+					updateError = installAllServices(update, cc)
 				}
 				if updateError != nil {
 					logError(updateError)
@@ -773,6 +780,7 @@ func NewSystemCMD() *cobra.Command {
 	systemCMD.Flags().BoolVar(&uninstall, "uninstall", false, "uinstalls all services and packages")
 	systemCMD.Flags().BoolVar(&status, "status", false, "get status of system services")
 	systemCMD.Flags().BoolVar(&restart, "restart", false, "restart all services")
+	systemCMD.Flags().BoolVar(&cc, "cc", false, "clears go mod cache")
 	return &systemCMD
 }
 
