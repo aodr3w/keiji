@@ -504,12 +504,11 @@ func NewTaskCMD() *cobra.Command {
 		Long:  "cobra commands to create, update, deploy, or delete tasks",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var taskError error
-			log.Println("checking workspace..")
 			if err := checkWorkSpace(); err != nil {
 				logError(err)
 				return nil
 			}
-			if !valid(name) {
+			if !valid(name) && !get {
 				logError(fmt.Errorf("please provide name for your task"))
 				return nil
 			}
@@ -648,9 +647,21 @@ func resolveError(name string) error {
 
 func getTask(name string) error {
 	if valid(name) {
-		log.Printf("getting task %v\n", name)
+		task, err := cmdRepo.GetTaskByName(name)
+		if err != nil {
+			return err
+		}
+		fmt.Println(task)
 	} else {
-		log.Printf("getting all tasks..")
+		tasks, err := cmdRepo.GetAllTasks()
+		if err != nil {
+			return err
+		}
+		for _, task := range tasks {
+			fmt.Println(strings.Repeat("=", 100))
+			fmt.Println(task)
+			fmt.Println(strings.Repeat("=", 100))
+		}
 	}
 	return nil
 }
