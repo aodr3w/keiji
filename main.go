@@ -661,10 +661,11 @@ func buildTask(name string, restart bool) error {
 	if err != nil {
 		return err
 	}
-	logInfo("task found , building...")
+
 	if !exists {
 		return common.ErrPathNotFound(taskPath)
 	}
+	logInfo("task found , building...")
 	//run schedule/main.go
 	err = runCMD(taskPath, false, "go", "run", filepath.Join(taskPath, "schedule", "main.go"))
 	if err != nil {
