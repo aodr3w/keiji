@@ -604,6 +604,10 @@ func createTask(name string, description string, force bool) error {
 	if err != nil {
 		return err
 	}
+	err = runCMD(paths.WORKSPACE, false, "go", "mod", "tidy")
+	if err != nil {
+		return err
+	}
 	log.Println(aurora.Green("task created"))
 	return nil
 }
