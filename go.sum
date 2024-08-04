@@ -2,6 +2,8 @@ github.com/aodr3w/keiji-bus-client v0.0.0-20240731150430-f0f54f987d6d h1:doQKE7x
 github.com/aodr3w/keiji-bus-client v0.0.0-20240731150430-f0f54f987d6d/go.mod h1:Ih/XM5e7n++adVNQOzBuXzaQE8yS17pwhRT2R8bi/rs=
 github.com/aodr3w/keiji-core v0.0.0-20240803122810-5f2318020d78 h1:BRLoeiWXYMPqJhW3GmFhlVgdh80FWb6m8IrDKAqijqQ=
 github.com/aodr3w/keiji-core v0.0.0-20240803122810-5f2318020d78/go.mod h1:74OEd4Bke4PpyWk6Ai/Z+bK84msq4v0JRbkNytCtfQM=
+github.com/aodr3w/keiji-core v0.0.0-20240803125043-fc2465b659d4 h1:mMW4Vj5758wWz6xyBNXifS4Lds4Urcx3P/E3KunswUE=
+github.com/aodr3w/keiji-core v0.0.0-20240803125043-fc2465b659d4/go.mod h1:74OEd4Bke4PpyWk6Ai/Z+bK84msq4v0JRbkNytCtfQM=
 github.com/aodr3w/logger v0.0.0-20240718094903-5071dde6db05 h1:9Kc7Be+L8z1v3PeWbcmsVGQ1zvszmv1q58D8l1dh0Bs=
 github.com/aodr3w/logger v0.0.0-20240718094903-5071dde6db05/go.mod h1:DT4Tj2GLcyqSDJ4tGbKJk9Df0WA2EJ8wUlP1FJ+YFqE=
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
@@ -14,8 +16,12 @@ github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsI
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a h1:bbPeKD0xmW/Y25WS6cokEszi5g+S0QxI/d45PkRi7Nk=
 github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
+github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=
+github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
 github.com/jackc/pgx/v5 v5.5.5 h1:amBjrZVmksIdNjxGW/IiIMzxMKZFelXbUoPNb+8sjQw=
 github.com/jackc/pgx/v5 v5.5.5/go.mod h1:ez9gk+OAat140fv9ErkZDYFWmXLfV+++K0uAOiwgm1A=
+github.com/jackc/pgx/v5 v5.6.0 h1:SWJzexBzPL5jb0GEsrPMLIsi/3jOo7RHlzTjcAeDrPY=
+github.com/jackc/pgx/v5 v5.6.0/go.mod h1:DNZ/vlrUnhWCoFGxHAG8U2ljioxukquj7utPDgtQdTw=
 github.com/jackc/puddle/v2 v2.2.1 h1:RhxXJtFG022u4ibrCSMSiu5aOq1i77R3OHKNJj77OAk=
 github.com/jackc/puddle/v2 v2.2.1/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
