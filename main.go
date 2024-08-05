@@ -436,7 +436,6 @@ func isServiceRunning(service c.Service) bool {
 	err = syscall.Kill(pid, 0)
 	if err != nil {
 		if err == syscall.ESRCH {
-			logError(fmt.Sprintf("process with PID %d does not exist", pid))
 			return false
 		} else if err == syscall.EPERM {
 			logError("permission denied")
@@ -867,6 +866,11 @@ func restartAllServices() error {
 	return nil
 }
 func restartService(service c.Service) error {
+	isRunning := isServiceRunning(service)
+	if !isRunning {
+		logError(fmt.Sprintf("service %s cannot be restarted because its not running", service))
+		return nil
+	}
 	err := stopService(service)
 	if err != nil {
 		return err
