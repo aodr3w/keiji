@@ -811,8 +811,12 @@ func getServiceLogPath(service c.Service) (string, error) {
 }
 
 func startService(service c.Service) error {
-	//we need to run the service while also retrieving its pid
-	//get service log file
+	//check if service is running first
+	isRunning := isServiceRunning(service)
+	if isRunning {
+		logWarn("service already running")
+		return nil
+	}
 	err := runServiceCMD(service)
 	if err != nil {
 		return err
