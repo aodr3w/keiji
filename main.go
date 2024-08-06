@@ -868,7 +868,6 @@ func restartAllServices() error {
 func restartService(service c.Service) error {
 	isRunning := isServiceRunning(service)
 	if !isRunning {
-		logError(fmt.Sprintf("service %s cannot be restarted because its not running", service))
 		return nil
 	}
 	err := stopService(service)
