@@ -217,14 +217,22 @@ func InstallService(service c.Service, update bool, cc bool) error {
 		return fmt.Errorf("please provide repo url for %s", service)
 	}
 
+	if update {
+		logInfo(fmt.Sprintf("updating %s", service))
+	} else {
+		logInfo(fmt.Sprintf("installing %s", service))
+	}
 	err = runCMD(paths.WORKSPACE, true, "go", "install", fmt.Sprintf("%v@main", repoURL))
 	if err != nil {
 		return err
 	}
 
+	logInfo("ok")
+
 	if !update {
 		return nil
 	} else {
+		logInfo("restarting service")
 		return restartService(service)
 	}
 
@@ -868,6 +876,7 @@ func restartAllServices() error {
 func restartService(service c.Service) error {
 	isRunning := isServiceRunning(service)
 	if !isRunning {
+		logWarn("service is not running.")
 		return nil
 	}
 	err := stopService(service)
