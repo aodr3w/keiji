@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	busclient "github.com/aodr3w/keiji-bus-client/client"
 	cmdErrors "github.com/aodr3w/keiji-cli/errors"
@@ -49,9 +50,11 @@ var rootCmd = &cobra.Command{
 type Editor string
 
 const (
-	VIM  Editor = "vim"
-	NANO Editor = "nano"
-	CODE Editor = "code"
+	VIM           Editor = "vim"
+	NANO          Editor = "nano"
+	CODE          Editor = "code"
+	maxRetries           = 10
+	retryInterval        = 1 * time.Second
 )
 
 /*
@@ -439,6 +442,7 @@ func isServiceRunning(service c.Service) bool {
 	pidPath := paths.PID_PATH(service)
 	pid, err := readPID(pidPath)
 	if err != nil {
+		logError(fmt.Sprintf("%s: %v", pidPath, err))
 		return false
 	}
 	err = syscall.Kill(pid, 0)
@@ -449,7 +453,7 @@ func isServiceRunning(service c.Service) bool {
 			logError("permission denied")
 			return false
 		}
-		logError(err)
+		logError(fmt.Sprintf("%d: %v", pid, err))
 		return false
 	}
 	return true
@@ -903,7 +907,16 @@ func stopService(service c.Service) error {
 	if err != nil {
 		return fmt.Errorf("kill error: %v", err)
 	}
-	return nil
+
+	for c := 0; c < maxRetries; c++ {
+		r := isServiceRunning(service)
+		if !r {
+			logInfo(fmt.Sprintf("%s stopped successfully", service))
+			return nil
+		}
+		time.Sleep(retryInterval)
+	}
+	return fmt.Errorf("failed to stop service after %d retries, run ps aux to inspect", maxRetries)
 }
 
 func handleGetTaskLogs(name string, code, vim, nano bool) error {
