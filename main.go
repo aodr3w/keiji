@@ -506,7 +506,7 @@ func logError(msg interface{}) {
 }
 
 func NewTaskCMD() *cobra.Command {
-	var create, build, disable, delete, restart, get, force, resolve bool
+	var create, build, disable, enable, delete, restart, get, force, resolve bool
 	var logs, code, vim, nano bool
 	var name, description string
 	taskCMD := cobra.Command{
@@ -531,6 +531,8 @@ func NewTaskCMD() *cobra.Command {
 				}
 			} else if disable {
 				taskError = disableTask(name)
+			} else if enable {
+				taskError = enableTask(name)
 			} else if get {
 				taskError = getTask(name)
 			} else if delete {
@@ -560,6 +562,7 @@ func NewTaskCMD() *cobra.Command {
 	taskCMD.Flags().BoolVar(&force, "force", false, "provid true to force createTask operation")
 	taskCMD.Flags().BoolVar(&build, "build", false, "provide true to rebuild task executable")
 	taskCMD.Flags().BoolVar(&resolve, "resolve", false, "provide true to resolve task.isError")
+	taskCMD.Flags().BoolVar(&enable, "enable", false, "provide true to set task.IsDisabled to False")
 	taskCMD.Flags().BoolVar(&logs, "logs", false, "returns last 100 log lines for service")
 	taskCMD.Flags().BoolVar(&code, "code", false, "opens service logs in vscode")
 	taskCMD.Flags().BoolVar(&vim, "vim", false, "opens service logs in vim")
@@ -622,9 +625,12 @@ func createTask(name string, description string, force bool) error {
 	return nil
 }
 
+func enableTask(name string) error {
+	_, err := cmdRepo.SetIsDisabled(name, false)
+	return err
+}
+
 func disableTask(name string) error {
-	log.Printf("disabling task %v\n", name)
-	//send disable signal to tcp-bus
 	task, err := cmdRepo.GetTaskByName(name)
 	if err != nil {
 		return err
@@ -633,7 +639,6 @@ func disableTask(name string) error {
 }
 
 func deleteTask(name string) error {
-	log.Printf("deleting task %v\n", name)
 	task, err := cmdRepo.GetTaskByName(name)
 	if err != nil {
 		return err
