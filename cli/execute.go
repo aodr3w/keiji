@@ -254,11 +254,6 @@ func NewInitCMD() *cobra.Command {
 					logError(err)
 					return nil
 				}
-				err = runCMD(paths.WORKSPACE, true, "go", "get", "github.com/aodr3w/keiji-tasks@main")
-				if err != nil {
-					logError(err)
-					return nil
-				}
 				cmdRepo, err = newRepo()
 				if err != nil {
 					logError(err)
@@ -609,10 +604,6 @@ func createTask(name string, description string, force bool) error {
 		return err
 	}
 
-	err = runCMD(paths.WORKSPACE, false, "go", "get", "-u", "github.com/aodr3w/keiji-tasks@main")
-	if err != nil {
-		return err
-	}
 	err = writeEnvFile(taskPath, name, description)
 	if err != nil {
 		return err
