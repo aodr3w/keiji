@@ -2,10 +2,7 @@ module github.com/aodr3w/keiji-cli
 
 go 1.22.5
 
-require (
-	github.com/aodr3w/keiji-bus-client v0.0.0-20240731150430-f0f54f987d6d
-	github.com/spf13/cobra v1.8.1
-)
+require github.com/spf13/cobra v1.8.1
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect

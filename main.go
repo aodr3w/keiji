@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	busclient "github.com/aodr3w/keiji-bus-client/client"
 	cmdErrors "github.com/aodr3w/keiji-cli/errors"
+	"github.com/aodr3w/keiji-core/bus"
 	"github.com/aodr3w/keiji-core/common"
 	c "github.com/aodr3w/keiji-core/constants"
 	"github.com/aodr3w/keiji-core/db"
@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var bc = busclient.NewBusClient()
+var bc = bus.NewBusClient()
 var cmdRepo *db.Repo
 
 // serviceLogsMapping is mapping of service to logsPath

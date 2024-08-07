@@ -1,5 +1,3 @@
-github.com/aodr3w/keiji-bus-client v0.0.0-20240731150430-f0f54f987d6d h1:doQKE7xYntcMoql2WKAUjHueniJ3bOS7AGUxCkcs2Bw=
-github.com/aodr3w/keiji-bus-client v0.0.0-20240731150430-f0f54f987d6d/go.mod h1:Ih/XM5e7n++adVNQOzBuXzaQE8yS17pwhRT2R8bi/rs=
 github.com/aodr3w/keiji-core v0.0.0-20240807081309-c632afa2cd26 h1:FCnijoFD9WLrqJkmXZ9Yg5k+cVms1eeH/zE3ohClu7M=
 github.com/aodr3w/keiji-core v0.0.0-20240807081309-c632afa2cd26/go.mod h1:7tvGeJldmZ1epqi1J7FG5qF3lztR87abWY9HweujYAM=
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
