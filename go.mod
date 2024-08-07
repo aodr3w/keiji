@@ -1,4 +1,4 @@
-module github.com/aodr3w/keiji-cli
+module github.com/aodr3w/keiji
 
 go 1.22.5
 
