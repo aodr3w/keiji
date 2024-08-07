@@ -14,7 +14,6 @@ import (
 	"syscall"
 	"time"
 
-	cmdErrors "github.com/aodr3w/keiji-cli/errors"
 	"github.com/aodr3w/keiji-core/bus"
 	"github.com/aodr3w/keiji-core/common"
 	c "github.com/aodr3w/keiji-core/constants"
@@ -22,6 +21,7 @@ import (
 	"github.com/aodr3w/keiji-core/logging"
 	"github.com/aodr3w/keiji-core/paths"
 	"github.com/aodr3w/keiji-core/utils"
+	cmdErrors "github.com/aodr3w/keiji/errors"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
