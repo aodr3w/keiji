@@ -113,7 +113,7 @@ func getTemplateRepoPath(get bool) (string, error) {
 		func(path string, info fs.FileInfo, err error) error {
 			if strings.Contains(info.Name(), "keiji-core") {
 				repoPath = path
-				return filepath.SkipDir
+				return filepath.SkipAll
 			}
 			return nil
 		},
@@ -595,8 +595,8 @@ func createTask(name string, description string, force bool) error {
 	}
 	//create destination folder
 	err = filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
-		if d.Name() == "tasks" {
-			return utils.CopyDir(filepath.Join(path), taskPath)
+		if d.Name() == "templates" {
+			return utils.CopyDir(filepath.Join(path, "tasks"), taskPath)
 		}
 		return nil
 	})
@@ -608,11 +608,12 @@ func createTask(name string, description string, force bool) error {
 	if err != nil {
 		return err
 	}
+	logWarn(fmt.Sprintf("creating task %v", name))
 	err = runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
 	if err != nil {
 		return err
 	}
-	log.Println(aurora.Green("task created"))
+	log.Println(aurora.Green("ok"))
 	return nil
 }
 

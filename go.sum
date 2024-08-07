@@ -1,5 +1,5 @@
-github.com/aodr3w/keiji-core v0.0.0-20240807081309-c632afa2cd26 h1:FCnijoFD9WLrqJkmXZ9Yg5k+cVms1eeH/zE3ohClu7M=
-github.com/aodr3w/keiji-core v0.0.0-20240807081309-c632afa2cd26/go.mod h1:7tvGeJldmZ1epqi1J7FG5qF3lztR87abWY9HweujYAM=
+github.com/aodr3w/keiji-core v0.1.0 h1:a5qDBq2bGjqFpVVDatO6v1yB7qnngJbpaOdNqSwlFcM=
+github.com/aodr3w/keiji-core v0.1.0/go.mod h1:jj8xSUYjx8i2bbkZ3HovyhFO6rMKW0EM2L6v3EFrMrs=
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
