@@ -608,7 +608,7 @@ func createTask(name string, description string, force bool) error {
 	if err != nil {
 		return err
 	}
-	err = runCMD(paths.WORKSPACE, false, "go", "mod", "tidy")
+	err = runCMD(paths.WORKSPACE, true, "go", "mod", "tidy")
 	if err != nil {
 		return err
 	}
