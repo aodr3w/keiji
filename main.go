@@ -19,9 +19,9 @@ import (
 	"github.com/aodr3w/keiji-core/common"
 	c "github.com/aodr3w/keiji-core/constants"
 	"github.com/aodr3w/keiji-core/db"
+	"github.com/aodr3w/keiji-core/logging"
 	"github.com/aodr3w/keiji-core/paths"
 	"github.com/aodr3w/keiji-core/utils"
-	"github.com/aodr3w/logger"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
@@ -305,7 +305,7 @@ func NewInitCMD() *cobra.Command {
 				if !ok {
 					logError(fmt.Errorf("logPath not found for service %v", service))
 				}
-				_, err := logger.NewFileLogger(logPath)
+				_, err := logging.NewFileLogger(logPath)
 				if err != nil {
 					logError(err)
 				}
@@ -1026,7 +1026,7 @@ func runServiceCMD(service c.Service) error {
 	if err != nil {
 		return err
 	}
-	_, err = logger.NewFileLogger(logsPath)
+	_, err = logging.NewFileLogger(logsPath)
 	if err != nil {
 		return err
 	}

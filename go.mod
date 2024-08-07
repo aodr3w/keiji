@@ -16,17 +16,16 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/crypto v0.26.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/text v0.17.0 // indirect
 	gorm.io/driver/postgres v1.5.9 // indirect
 	gorm.io/driver/sqlite v1.5.6 // indirect
 	gorm.io/gorm v1.25.11 // indirect
 )
 
 require (
-	github.com/aodr3w/keiji-core v0.0.0-20240805180625-e3c41677af7a
-	github.com/aodr3w/logger v0.0.0-20240718094903-5071dde6db05
+	github.com/aodr3w/keiji-core v0.0.0-20240807081309-c632afa2cd26
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/spf13/pflag v1.0.5 // indirect
