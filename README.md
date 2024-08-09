@@ -53,9 +53,19 @@ $WORKSPACE/
 **schedule.go**
  - the scheduling logic for your task goes here. Tasks can be of 2 types, `HMS tasks` or `DayTime tasks`. 
 
- - `HMS` --> `HoursSecondsMinutes` --> a task run on a fixed interval
+ - `HMS` --> `HoursSecondsMinutes` --> a task run on a fixed interval e.g
+
+ ```
+ tasks.NewSchedule().Run().Every(10).Seconds().Build()
+
+ ```
  
- - `DayTime` --> `Day and Time` --> a task run on a specific day at a specific time
+ - `DayTime` --> `Day and Time` --> a task run on a specific day at a specific time e.g
+
+ ```
+ return tasks.NewSchedule().On().Monday().At("10:00PM").Build()
+
+ ```
  
 ## start system
 
