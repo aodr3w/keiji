@@ -26,7 +26,37 @@ the `init` command does other things such as:
 
 ## create tasks
 
+**command**
+creating a task requires the following command;
 
+```
+# keiji task --create --name=<task_name> --desc=<task_description>
+```
+
+here is an example;
+
+```
+# keiji task --create --name=ping_google --desc="pings google"
+```
+
+once done , check your $WORKSPACE/tasks folder , you should find a folder with the
+task name containing 3 files;
+
+```
+$WORKSPACE/
+└── tasks/
+    └── ping_google/
+        ├── schedule.go
+        ├── main.go
+        └── function.go
+```
+**schedule.go**
+ - the scheduling logic for your task goes here. Tasks can be of 2 types, `HMS tasks` or `DayTime tasks`. 
+
+ - `HMS` --> `HoursSecondsMinutes` --> a task run on a fixed interval
+ 
+ - `DayTime` --> `Day and Time` --> a task run on a specific day at a specific time
+ 
 ## start system
 
 
