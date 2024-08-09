@@ -1,16 +1,25 @@
 # KEIJI - 計時 (TIME KEEPING)
-keiji is command line based go application that allows for creation and scheduling of golang functions.
+- keiji is the main entry point to the keiji task scheduling system. it provides a cobra-based cli that provides control commands for managing both services and tasks.
 
-# installation
-- go install https://github.com/aodr3w/keiji@latest
+## INSTALLATION
 
-# USAGE
-# step 1: initialize a workspace
-inorder to use keiji you need to first initialize a workspace , which is a folder in your home directory where your database settings and function source code will go.
- - keiji init
+`go install https://github.com/aodr3w/keiji@latest`
 
-# step 2: create a task
-to create task run the following command
-- keiji task --create --name=<task_name> --desc=<task_description> 
-this command will create a task called <task_name> in your workspace
-for examples on how to create and schedule tasks, check the examples folder
+## USAGE
+
+**Initializing a workspace**
+ - Before you can do anything on keiji, you have to initialize a workspace, which is a folder where all your tasks as well as settings related to `DATABASE, LOG MANAGEMENT & TIMEZONE preferences` will be found. this can be done with the `init command`
+
+**command**
+
+`keiji init`
+
+After running the init command there should be a workspace folder at `$HOME/keiji` Inside this folder you should see the following:
+- `setting.conf` -> contains settings for `DATABASE`, `LOGGING` && `TIMEZONE`.
+- `/tasks` -> created tasks go here
+- `go.mod` -> installed packages used by tasks go here
+
+the `init` command does other things such as:
+- installing the scheduler & bus services.
+- initializing log files for services located in $HOME/.keiji.
+
