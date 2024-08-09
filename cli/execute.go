@@ -32,7 +32,7 @@ var cmdRepo *db.Repo
 // serviceLogsMapping is mapping of service to logsPath
 var serviceLogsMapping = map[c.Service]string{
 	c.SCHEDULER: paths.SCHEDULER_LOGS,
-	c.TCP_BUS:   paths.TCP_BUS_LOGS,
+	c.TCP_BUS:   paths.BUS_LOGS,
 }
 
 // serviceRepos is a mapping of service to github repo
@@ -812,7 +812,7 @@ func getServiceLogPath(service c.Service) (string, error) {
 	case c.SCHEDULER:
 		return paths.SCHEDULER_LOGS, nil
 	case c.TCP_BUS:
-		return paths.TCP_BUS_LOGS, nil
+		return paths.BUS_LOGS, nil
 	default:
 		return "", fmt.Errorf("invalid service name %v", service)
 	}
