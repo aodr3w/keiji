@@ -24,33 +24,33 @@ the `init` command does other things such as:
 - initializing log files for services located in `$HOME/.keiji/logs`
 
 
-# create tasks
+## create tasks
 
 
-# start system
+## start system
 
 
-# change task schedule / source code / restart task
+## change task schedule / source code / restart task
 
 
-# view task logs
+## view task logs
 
 
-# disable a task
+## disable a task
 
 
-# delete a task
+## delete a task
 
 
-# view system logs
+## view system logs
 
 
-# stop system
+## stop system
 
 
-# restart system
+## restart system
 
 
-# uninstall system
+## uninstall system
 
 
