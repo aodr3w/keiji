@@ -1,5 +1,16 @@
-# KEIJI - 計時 (TIME KEEPING)
-- keiji is the main entry point to the keiji task scheduling system. it provides a cobra-based cli that provides control commands for managing both services and tasks.
+# KEIJI - 計時 (time keeping)
+
+## MOTIVIATION
+
+- The goal of this project was to develop a `task scheduling system` with a `python-schedule-like api` (https://schedule.readthedocs.io/en/stable/) , that also takes full advantage of golangs native features, such as concurrency and type safety.
+
+
+# SYSTEM OVERVIEW
+![Keiji Scheduling System Overview](images/KEIJI-SCHEDULING-SYSTEM-OVERVIEW.png)
+
+## DESCRIPTION
+
+<describe overview>
 
 ## INSTALLATION
 
