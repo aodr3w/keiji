@@ -20,7 +20,7 @@ describe the system overview
 go install github.com/aodr3w/keiji@latest
 ```
 
-after install, `keiji command should be available`
+After install, `keiji command should be available`
 
 
 ## USAGE
