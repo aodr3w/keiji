@@ -8,9 +8,6 @@
 # SYSTEM OVERVIEW
 ![Keiji Scheduling System Overview](images/KEIJI-SCHEDULING-SYSTEM-OVERVIEW.png)
 
-## DESCRIPTION
-
-<describe overview>
 
 ## INSTALLATION
 
