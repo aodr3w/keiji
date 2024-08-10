@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
@@ -957,19 +958,28 @@ func handleGetLogs(path string, code, vim, nano bool) error {
 
 func OpenInEditor(editor Editor, path string) error {
 	var cmd *exec.Cmd
-
+	osType := runtime.GOOS
 	switch editor {
 	case VIM, NANO:
-		// Use osascript to open a new terminal window and run the editor
-		script := fmt.Sprintf(`tell application "Terminal"
-            do script "%s %s"
-            activate
-        end tell`, editor, path)
-		cmd = exec.Command("osascript", "-e", script)
+		switch osType {
+		case "linux":
+			cmd = exec.Command(string(editor), path)
+		case "darwin":
+			// Use osascript to open a new terminal window and run the editor
+			script := fmt.Sprintf(`tell application "Terminal"
+			        do script "%s %s"
+			        activate
+			    end tell`, editor, path)
+			cmd = exec.Command("osascript", "-e", script)
+		default:
+			return fmt.Errorf("unsupported operating system: %s", osType)
+		}
 	case CODE:
 		cmd = exec.Command(string(editor), path)
+
 	default:
 		return fmt.Errorf("unsupported editor: %s", editor)
+
 	}
 
 	cmd.Stdout = os.Stdout
