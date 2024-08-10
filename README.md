@@ -32,7 +32,7 @@ go install github.com/aodr3w/keiji@latest
 2024/08/10 18:44:01 ok
 ```
 
-$WORKSPACE = `$HOME/keiji`
+after `initialization` you should have the folder structure below at `$HOME/keiji`
 
 ```
 keiji
@@ -41,6 +41,12 @@ keiji
 ├── settings.conf
 └── tasks
 ```
+- `go.mod & go.sum` - all workspace dependencies used by your tasks.
+
+- `settings.conf` - `database` , `timezone`, `log rotation settings`
+
+- `tasks/` - all tasks are located here once created
+
 
 ## USAGE
 
