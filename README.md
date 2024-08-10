@@ -66,31 +66,54 @@ $WORKSPACE/
  return tasks.NewSchedule().On().Monday().At("10:00PM").Build()
 
  ```
+ - the time value passed must in a valid format i.e 12h or 24h
  
+ ## build / save task
+ - before a task is run it has to be `built`. Building at a task, creates/updates the task binary located at $HOME/.keiji/exec
+ and stores task scheduling information in the database , so it can be picked up by the scheduler.
+
+`command` : `keiji task --build --name=<task_name>`
+
 ## start system
+- inorder for tasks to be scheduled, the system (`scheduler and bus service`) have to both be running.
+
+`command` : `keiji system --start`
 
 
-## change task schedule / source code / restart task
+## view logs
+- you can confirm the system is running by checking the logs
 
+- scheduler logs: `keiji system --logs --scheduler`
+- bus logs: `keiji system --logs --bus`
+- you can also open the logs files in one of 3 editors, namely; `vim`, `nano` or `code` simply add the flag to
+the command e.g `keiji system --logs --scheduler --code`
 
 ## view task logs
+- `keiji task --logs --name=<task_name> --<editor>`
+
+## change task schedule / source code / restart task
+to change a task;
+- open workspace in your favourite editor
+- change the task `logic (function.go)` or `schedule (schedule.go)`
+- build task with restart flag; `keiji task --build --name=<task_name> --restart`
+- check task logs to confirm your changes have taken effect e.g `keiji task --logs --name=<task_name> --code`
 
 
 ## disable a task
-
+`keiji task --disable --name=<task_name>`
 
 ## delete a task
-
-
-## view system logs
-
+`keiji task --delete --name=<task_name>`
 
 ## stop system
+`keiji system --stop`
 
 
 ## restart system
+`keiji system --restart`
 
 
 ## uninstall system
+`keiji system --uninstall`
 
 
