@@ -231,26 +231,65 @@ ErrorTxt:
 
 ## STEP 5: start system
 
+**start system command**
+
 ```
 keiji system --start
 ```
+**output**
+
+```
+2024/08/10 19:51:44 /Users/andrewodiit/.keiji/exec/services/bus.pid: PID file not found
+2024/08/10 19:51:44 service started with pid 72628
+2024/08/10 19:51:44 /Users/andrewodiit/.keiji/exec/services/scheduler.pid: open /Users/andrewodiit/.keiji/exec/services/scheduler.pid: no such file or directory
+2024/08/10 19:51:44 service started with pid 72630
+```
+
+**check system status command**
 
 ```
 keiji system --status
 ```
+**output**
+
+```
+======== SERVICES ========
+NAME               STATUS            
+bus                ONLINE            
+scheduler          ONLINE            
+======== SERVICES ========
+```
+
 
 ## STEP 6: view logs
 
+**bus logs**
 ```
 keiji system --logs --bus 
 ```
+**output**
+```
+2024/08/10 19:51:44 waiting for termination signal
+2024/08/10 19:51:44 Server started at :8005
+2024/08/10 19:51:44 Server started at :8006
+```
+
+**scheduler logs**
 
 ```
-keiji system --logs --scheduler --vim
+keiji system --logs --scheduler
 ```
+**output**
 
 ```
-keiji task --logs --name=ping_google --nano
+2024/08/10 19:51:45 waiting for termination signal
+time=2024-08-10T19:51:45.330+03:00 level=INFO msg="starting tcp-bus listener"
+time=2024-08-10T19:51:45.330+03:00 level=INFO msg="running start function"
+```
+
+
+```
+keiji task --logs --name=ping_google --vim
 ```
 
 
