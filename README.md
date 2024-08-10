@@ -69,6 +69,7 @@ keiji
 ```
 .keiji
 ├── db
+│   └── keiji.db
 └── logs
     └── services
         ├── bus
@@ -79,7 +80,8 @@ keiji
             └── scheduler.log
 
 ```
-.keiji folder is the `SYSTEM ROOT`. Executables and logs are stored here.
+
+`db` - contains the default `sqllite3 db` created ud
 
 **WARNING ⚠️ : DO NOT MODIFY THE STRUCTURE OF THESE DIRECTORIES**
 
