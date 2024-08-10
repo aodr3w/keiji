@@ -81,7 +81,7 @@ keiji
 
 ```
 
-`db` - default `sqllite3 storage` . It can be changed to postgresql in `settings.conf`
+`db` - `default sqllite3 storage` created during the initialization process. It can be changed to postgresql in `settings.conf`
 
 `logs` - contains log files for `services`. Once tasks are created, a folder for `tasks` will appear here.
 
