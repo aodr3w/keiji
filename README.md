@@ -2,7 +2,7 @@
 
 ## MOTIVIATION
 
-- Develop  a concurrent task scheduling system in go.
+- Develop a concurrent task scheduling system in go.
 
 
 ## SYSTEM OVERVIEW
@@ -18,6 +18,28 @@ describe the system overview
 
 ```
 go install github.com/aodr3w/keiji@latest
+```
+**output**
+
+```
+2024/08/10 18:43:43 open /Users/andrewodiit/keiji/settings.conf: no such file or directory
+2024/08/10 18:43:43 Initializing work space...
+2024/08/10 18:43:53 service scheduler not found
+2024/08/10 18:43:53 service bus not found
+2024/08/10 18:43:53 installing scheduler
+2024/08/10 18:43:58 ok
+2024/08/10 18:43:58 installing bus
+2024/08/10 18:44:01 ok
+```
+
+$WORKSPACE = `$HOME/keiji`
+
+```
+keiji
+├── go.mod
+├── go.sum
+├── settings.conf
+└── tasks
 ```
 
 ## USAGE
