@@ -92,18 +92,89 @@ NB: Folder structure is required for clear separation of concerns. This is parti
 
 ## STEP 2: create tasks
 
+**command**
+
 ```
 keiji task --create --name=ping_google --desc="pings google"
 ```
 
+**output**
+
 ```
-$WORKSPACE/
-└── tasks/
-    └── ping_google/
-        ├── schedule.go
+2024/08/10 19:27:09 creating task ping_google
+2024/08/10 19:27:09 ok
+
+```
+**result**
+
+```
+keiji
+└── tasks
+    └── ping_google
+        ├── .env
+        ├── function.go
         ├── main.go
-        └── function.go
+        └── schedule.go
 ```
+
+`function.go`
+
+- tasks logic goes here e.g
+ 
+ ```
+ func Function() error {
+	/*
+		please put the logic you wish to execute in this function.
+	*/
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	resp, err := client.Get("https://www.google.com/")
+	fmt.Println("status: ", resp.StatusCode)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+```
+
+`schedule.go`
+- tasks schedule goes here e.g
+
+```
+package main
+
+import (
+	"log"
+
+	"github.com/aodr3w/keiji-core/tasks"
+)
+
+func Schedule() error {
+	/*
+		    DEFINE FUNCTION SCHEDULE HERE
+			example;
+			 core.NewSchedule().Run().Every(10).Seconds().Build()
+			)
+	*/
+	log.Println("scheduling function...")
+	return tasks.NewSchedule().Run().Every(10).Seconds().Build()
+}
+
+```
+- a task can can be schedule to run on a fixed interval defined `Seconds, Minutes or Hours` e.g
+
+```
+return tasks.NewSchedule().Run().Every(10).Seconds().Build()
+```
+
+- alternatively, it can be scheduled to run on a specific day at a specific time e.g
+
+```
+return tasks.NewSchedule().On().Friday().At("10:00PM").Build()
+```
+- the time value can be either `12hour or 24hour format`.
 
 ## STEP 3: build & save task
 
