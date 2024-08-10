@@ -104,6 +104,19 @@ keiji task --delete --name=ping_google
 ```
 
 
+## STEP 10: changing database
+
+```
+modify settings.conf in workspace && restart system
+```
+
+
+## STEP 9: enable/disable log rotation
+
+```
+modify settings.conf in workspace && restart system
+```
+
 ## STEP 10: stop system
 
 ```
