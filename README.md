@@ -23,7 +23,6 @@ go install github.com/aodr3w/keiji@latest
  
 ```
 workspace structure
-
 ```
 
 
@@ -88,6 +87,8 @@ keiji task --logs --name=ping_google --nano
 **update source code**
 
 **update schedule**
+
+**check task details**
 
 
 ## STEP 8: disable a task
