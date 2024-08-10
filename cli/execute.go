@@ -699,7 +699,7 @@ func buildTask(name string, restart bool) error {
 func NewSystemCMD() *cobra.Command {
 	//start stop update system services
 	var start, stop, logs, update, uninstall, cc bool
-	var server, scheduler, bus, status, restart bool
+	var scheduler, bus, status, restart bool
 	var code, vim, nano bool
 	systemCMD := cobra.Command{
 		Use:   "system",
@@ -791,7 +791,6 @@ func NewSystemCMD() *cobra.Command {
 			return fmt.Errorf("no flag provided")
 		},
 	}
-	systemCMD.Flags().BoolVar(&server, "server", false, "manage server service")
 	systemCMD.Flags().BoolVar(&scheduler, "scheduler", false, "manage scheduler service")
 	systemCMD.Flags().BoolVar(&bus, "bus", false, "manage tcp-bus service")
 	systemCMD.Flags().BoolVar(&start, "start", false, "starts system services")
