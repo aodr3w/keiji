@@ -2,7 +2,7 @@
 
 ## MOTIVIATION
 
-- Develop an easy to use `task scheduling system` in go.
+- Develop `an easy to use , cli-based task scheduling system` in go.
 
 
 ## SYSTEM OVERVIEW
