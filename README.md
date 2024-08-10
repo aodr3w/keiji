@@ -45,7 +45,7 @@ keiji
 
 - `settings.conf` - database , timezone & log rotation settings.
 
-- `tasks/` - tasks source code is stored here after creation.
+- `tasks/` - task source code is stored here after creation.
 
 
 ## USAGE
