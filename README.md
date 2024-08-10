@@ -11,7 +11,10 @@
 
 ## INSTALLATION
 
-`go install github.com/aodr3w/keiji@latest`
+```
+go install github.com/aodr3w/keiji@latest
+
+```
 
 ## USAGE
 
