@@ -177,17 +177,57 @@ return tasks.NewSchedule().On().Friday().At("10:00PM").Build()
 
 ## STEP 3: build & save task
 
+**command**
+
 ```
 keiji task --name=ping_google --build
 ```
 
+**output**
+
+```
+2024/08/10 19:46:30 task found , building...
+2024/08/10 19:46:32 scheduling function...
+2024/08/10 19:46:32 task saved
+sourcePath:  /Users/andrewodiit/keiji/tasks/ping_google
+2024/08/10 19:46:32 executable path /Users/andrewodiit/.keiji/exec/tasks/ping_google.bin
+2024/08/10 19:46:32 source path /Users/andrewodiit/keiji/tasks/ping_google
+2024/08/10 19:46:35 executable created
+
+2024/08/10 19:46:35 /Users/andrewodiit/go/pkg/mod/github.com/aodr3w/keiji-core@v0.2.2/db/repo.go:184 record not found
+[0.219ms] [rows:0] SELECT * FROM `task_models` WHERE name = "ping_google" AND `task_models`.`deleted_at` IS NULL ORDER BY `task_models`.`id` LIMIT 1
+2024/08/10 19:46:35 task saved
+```
 
 ## STEP 4: check task details
+
+**command**
 
 ```
 keiji task --get --name=ping_google
 ```
 
+**output**
+
+```
+TaskModel:
+ID: 1
+TaskId: ac965b18-b229-4360-a294-72913115bb45
+Name: ping_google
+Description: pings google
+Schedule: day:Friday,time:10:00PM
+LastExecutionTime: N/A
+NextExecutionTime: N/A
+LogPath: /Users/andrewodiit/.keiji/logs/tasks/ping_google/ping_google.log
+Slug: ping_google
+Type: DayTime
+Executable: /Users/andrewodiit/.keiji/exec/tasks/ping_google.bin
+IsRunning: false
+IsQueued: false
+IsError: false
+IsDisabled: false
+ErrorTxt: 
+```
 
 ## STEP 5: start system
 
