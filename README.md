@@ -43,7 +43,7 @@ keiji
 ```
 - `go.mod & go.sum` - all workspace dependencies used by your tasks.
 
-- `settings.conf` - `database , timezone, log rotation` settings.
+- `settings.conf` - database , timezone & log rotation settings.
 
 - `tasks/` - tasks source code is stored here after creation.
 
