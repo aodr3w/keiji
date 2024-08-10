@@ -161,7 +161,6 @@ func Schedule() error {
 	log.Println("scheduling function...")
 	return tasks.NewSchedule().Run().Every(10).Seconds().Build()
 }
-
 ```
 - a task can can be schedule to run on a fixed interval defined `Seconds, Minutes or Hours` e.g
 
