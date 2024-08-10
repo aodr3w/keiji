@@ -2,7 +2,7 @@
 
 ## MOTIVIATION
 
-- Develop `concurrent task scheduling system` in go.
+- Develop  a concurrent task scheduling system in go.
 
 
 ## SYSTEM OVERVIEW
