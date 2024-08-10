@@ -19,6 +19,16 @@ describe the system overview
 ```
 go install github.com/aodr3w/keiji@latest
 ```
+
+after install, `keiji command should be available`
+
+
+## USAGE
+
+## STEP 1: Initializing a workspace
+
+ - `keiji init`
+ 
 **output**
 
 ```
@@ -46,17 +56,6 @@ keiji
 - `settings.conf` - database , timezone & log rotation settings.
 
 - `tasks/` - task source code is stored here after creation.
-
-
-## USAGE
-
-## STEP 1: Initializing a workspace
-
- - `keiji init`
- 
-```
-workspace structure
-```
 
 
 ## STEP 2: create tasks
