@@ -85,7 +85,7 @@ keiji
 
 `logs` - contains log files for `services`. Once tasks are created, a folder for `tasks` will appear here.
 
-NB: folder structure is required for clear seperation of concerns . This is particularly import if log rotation is enabled.
+NB: folder structure is required for clear seperation of concerns. This is particularly important once log rotation is enabled.
 
 **WARNING ⚠️ : DO NOT MODIFY THE STRUCTURE OF THESE DIRECTORIES**
 
