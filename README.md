@@ -2,7 +2,7 @@
 
 ## MOTIVIATION
 
-- Develop `an easy to use , cli-based task scheduling system` in go.
+- Develop `concurrent task scheduling system` in go.
 
 
 ## SYSTEM OVERVIEW
