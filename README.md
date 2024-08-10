@@ -46,7 +46,9 @@ keiji init
 2024/08/10 18:44:01 ok
 ```
 
-after `initialization` you should have the folder structure below at `$HOME/keiji`
+after `initialization` you should have the following folder structures in your system 
+
+`$HOME/keiji`
 
 ```
 keiji
@@ -61,6 +63,8 @@ keiji
 
 - `tasks/` - task source code is stored here after creation.
 
+
+`$HOME/.keiji`
 
 ```
 .keiji
