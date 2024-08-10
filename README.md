@@ -2,7 +2,7 @@
 
 ## MOTIVIATION
 
-- The goal of this project was to develop a `task scheduling system` with a `python-schedule-like api` (https://schedule.readthedocs.io/en/stable/) , that also takes full advantage of golangs native features, such as concurrency and type safety.
+- Develop an easy to use `task scheduling system` in go.
 
 
 # SYSTEM OVERVIEW
