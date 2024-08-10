@@ -62,7 +62,22 @@ keiji
 - `tasks/` - task source code is stored here after creation.
 
 
-**WARNING ⚠️ : DO NOT MODIFY THE STRUCTURE OF THIS DIRECTORY**
+```
+.keiji
+├── db
+└── logs
+    └── services
+        ├── bus
+        │   └── bus.log
+        ├── repo
+        │   └── repo.log
+        └── scheduler
+            └── scheduler.log
+
+```
+.keiji folder is the `SYSTEM ROOT`. Executables and logs are stored here.
+
+**WARNING ⚠️ : DO NOT MODIFY THE STRUCTURE OF THESE DIRECTORIES**
 
 
 ## STEP 2: create tasks
