@@ -27,7 +27,11 @@ after install, `keiji command should be available`
 
 ## STEP 1: Initializing a workspace
 
- - `keiji init`
+**command**
+
+```
+keiji init
+```
  
 **output**
 
