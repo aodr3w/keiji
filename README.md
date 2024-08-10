@@ -5,7 +5,7 @@
 - Develop an easy to use `task scheduling system` in go.
 
 
-# SYSTEM OVERVIEW
+## SYSTEM OVERVIEW
 ![Keiji Scheduling System Overview](images/KEIJI-SCHEDULING-SYSTEM-OVERVIEW.png)
 
 
