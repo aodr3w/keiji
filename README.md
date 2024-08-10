@@ -119,7 +119,7 @@ keiji
 
 `function.go`
 
-- tasks logic goes here e.g
+- Tasks logic goes here e.g
  
  ```
  func Function() error {
@@ -140,7 +140,7 @@ keiji
 ```
 
 `schedule.go`
-- tasks schedule goes here e.g
+- Tasks schedule goes here e.g
 
 ```
 package main
@@ -162,18 +162,18 @@ func Schedule() error {
 	return tasks.NewSchedule().Run().Every(10).Seconds().Build()
 }
 ```
-- a task can can be schedule to run on a fixed interval defined `Seconds, Minutes or Hours` e.g
+- A task can can be schedule to run on a fixed interval defined `Seconds, Minutes or Hours` e.g
 
 ```
 return tasks.NewSchedule().Run().Every(10).Seconds().Build()
 ```
 
-- alternatively, it can be scheduled to run on a specific day at a specific time e.g
+- Alternatively, it can be scheduled to run on a specific day at a specific time e.g
 
 ```
 return tasks.NewSchedule().On().Friday().At("10:00PM").Build()
 ```
-- the time value can be either `12hour or 24hour format`.
+- The time value can be either `12hour or 24hour format`.
 
 ## STEP 3: build & save task
 
