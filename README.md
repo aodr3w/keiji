@@ -426,7 +426,7 @@ have taken full effect
 ## STEP 8: disable a task
 
 ```
-keiji task --disable --name=ping_google`
+keiji task --disable --name=ping_google
 ```
 
 ## STEP 9: delete a task
@@ -435,11 +435,6 @@ keiji task --disable --name=ping_google`
 keiji task --delete --name=ping_google
 ```
 
-## STEP 10: enable/disable log rotation
-
-```
-modify settings.conf in workspace && restart system
-```
 
 ## STEP 11: stop system
 
