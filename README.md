@@ -459,6 +459,6 @@ keiji system --uninstall
 
 - edit the `DB_URL` in `settings.conf` to a valid postgresURL and restart the system.
 
-**Can i use a database other than `sqllite3` and `postgresql` ?
+**Can i use a database other than `sqllite3` and `postgresql` ?**
 
 - keiji only supports `sqllite3` and `postgresql`, you would need to fork the repository and modify it as you wish.
