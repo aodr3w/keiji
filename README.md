@@ -425,9 +425,41 @@ have taken full effect
 
 ## STEP 8: disable a task
 
+
 ```
 keiji task --disable --name=ping_google
 ```
+
+☝🏾 **disable signal received by running task**
+
+```
+time=2024-08-11T14:20:07.119+03:00 level=INFO msg="status:  200"
+time=2024-08-11T14:20:10.828+03:00 level=INFO msg="task disabled, exiting..."
+```
+```
+====================================================================================================
+TaskModel:
+ID: 1
+TaskId: ac965b18-b229-4360-a294-72913115bb45
+Name: ping_google
+Description: pings google
+Schedule: units:seconds,interval:10
+LastExecutionTime: N/A
+NextExecutionTime: N/A
+LogPath: /Users/andrewodiit/.keiji/logs/tasks/ping_google/ping_google.log
+Slug: ping_google
+Type: HMS
+Executable: /Users/andrewodiit/.keiji/exec/tasks/ping_google.bin
+IsRunning: false
+IsQueued: false
+IsError: false
+IsDisabled: true
+ErrorTxt: 
+
+====================================================================================================
+````
+
+☝🏾 task record in database is marked as disabled so the scheduler will not attempt to pick it up. it can be enabled using the command `keiji task --enable --name=ping_google`, which makes the task runnable.
 
 ## STEP 9: delete a task
 
