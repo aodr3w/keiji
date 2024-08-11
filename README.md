@@ -454,10 +454,18 @@ keiji system --uninstall
 ```
 
 ## Q/A
+**How do i change my workspace settings ?**
 
-**How do i change the database from sqllite3 to postgres**
+Open settings.conf , you can modify one of 4 settings:
 
-- edit the `DB_URL` in `settings.conf` to a valid postgresURL and restart the system.
+- `DB_URL` - must be one of 2 values, `default` (sqllite3) or `a valid postgresql URL`.
+
+- `TIME_ZONE` - must be a valid `timezone string` in the format `Continent/City`.
+
+- `ROTATE_LOGS` - must be an integer either `1 (true)` or `0 (False)`.
+
+- `LOG_MAX_SIZE` - must be a non negative integer.
+
 
 **Can i use a database other than `sqllite3` and `postgresql` ?**
 
