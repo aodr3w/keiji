@@ -494,13 +494,13 @@ keiji task --delete --name=ping_google
 ```
 
 
-### STEP 11: stop system
+### STEP 10: stop system
 
 ```
 keiji system --stop
 ```
 
-### STEP 12: uninstall system
+### STEP 11: uninstall system
 
 ```
 keiji system --uninstall
