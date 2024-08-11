@@ -348,8 +348,80 @@ return tasks.NewSchedule().Run().Every(10).Seconds().Build()
 keiji task --name=ping_google --build --restart
 ```
 
+```
+2024/08/11 13:31:39 task found , building...
+2024/08/11 13:31:42 scheduling function...
+2024/08/11 13:31:42 task saved
+sourcePath:  /Users/andrewodiit/keiji/tasks/ping_google
+2024/08/11 13:31:42 executable path /Users/andrewodiit/.keiji/exec/tasks/ping_google.bin
+2024/08/11 13:31:42 source path /Users/andrewodiit/keiji/tasks/ping_google
+2024/08/11 13:31:44 executable created
+2024/08/11 13:31:44 task saved
+
+2024/08/11 13:31:44 restarting task ping_google
+```
+
 **check task details**
 
+```
+keiji task --get --name=ping_google
+```
+
+```
+TaskModel:
+ID: 1
+TaskId: ac965b18-b229-4360-a294-72913115bb45
+Name: ping_google
+Description: pings google
+Schedule: units:seconds,interval:10
+LastExecutionTime: N/A
+NextExecutionTime: N/A
+LogPath: /Users/andrewodiit/.keiji/logs/tasks/ping_google/ping_google.log
+Slug: ping_google
+Type: HMS
+Executable: /Users/andrewodiit/.keiji/exec/tasks/ping_google.bin
+IsRunning: true
+IsQueued: false
+IsError: false
+IsDisabled: false
+ErrorTxt: 
+```
+
+- ☝🏾 task type has changed from `DayTime` to `HMS` because the schedule has been changed.
+
+```
+time=2024-08-11T13:31:44.532+03:00 level=INFO msg="task terminated, exiting..."
+time=2024-08-11T13:31:45.535+03:00 level=INFO msg="task ping_google interval: 10"
+time=2024-08-11T13:31:57.164+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:31:57.164+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:32:06.488+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:32:06.488+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:32:16.414+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:32:16.414+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:32:26.453+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:32:26.454+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:32:36.487+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:32:36.487+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:32:46.396+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:32:46.397+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:32:56.337+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:32:56.338+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:33:06.392+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:33:06.392+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:33:16.524+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:33:16.525+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:33:26.460+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:33:26.460+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:33:36.491+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:33:36.491+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:33:46.424+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:33:46.424+03:00 level=INFO msg="status:  200"
+time=2024-08-11T13:33:56.460+03:00 level=INFO msg="Pinging Google...."
+time=2024-08-11T13:33:56.460+03:00 level=INFO msg="status:  200"
+````
+
+- ☝🏾 task logs clearly indicate that the task was restarted successfully, and our modifications
+have taken full effect
 
 ## STEP 8: disable a task
 
