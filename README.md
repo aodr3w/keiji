@@ -13,7 +13,7 @@ keiji is a concurrent task scheduling system written in Go, designed to efficien
 
 ### components
 
-#### **keiji-main**
+#### keiji-main
 
 Provides a command line interface (CLI) for interacting with tasks and services.
 Users can create, manage, and monitor tasks using straightforward CLI commands.
