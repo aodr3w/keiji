@@ -19,28 +19,28 @@ Provides a command line interface (CLI) for interacting with tasks and services.
 Users can create, manage, and monitor tasks using straightforward CLI commands.
 Supports commands for initializing workspaces, creating tasks, and more.
 
-**keiji-core**
+####  keiji-core
 
 Acts as the backbone of the entire system by providing essential services such as logging, storage, and utility functions.
 Ensures consistent and reusable functionality across all components.
 Handles database access, task creation APIs, templates, and more.
 
-**keiji-bus**
+####  keiji-bus
 
 Facilitates inter-process communication between the CLI and the scheduler. The bus acts as a bridge, relaying commands such as stop, disable, and delete from the CLI to the scheduler. The scheduler then listens for these commands on the bus and translates them into actionable directives that are executed as needed. These directives can be task specific or system wide.
 
-**keiji-scheduler**
+####  keiji-scheduler
 
 Manages the execution of tasks based on the schedule defined for the task.
 Reads commands from the bus and applies them as needed. These commands may be task directives e.g disable delete, stop or system level directives e.g shutdown.
 Logs all activities to provide detailed insights into task execution and system status.
 
-**task-binary**
+####  task-binary
 
 Each task, once created, is compiled into a binary executable.
 These binaries are executed on their scheduled intervals, with the scheduler managing their lifecycle.
 
-**work-space**
+#### work-space
 
 The workspace is a folder located at `$HOME/keiji`, designated for the development of tasks. It is created when the `init` command is run.
 
@@ -58,13 +58,13 @@ After install, the keiji command should be available.
 
 ### STEP 1: Initializing a workspace
 
-**command**
+#### command
 
 ```
 keiji init
 ```
  
-**output**
+#### output
 
 ```
 2024/08/10 18:43:43 open /Users/andrewodiit/keiji/settings.conf: no such file or directory
@@ -123,20 +123,20 @@ NB: Folder structure is required for clear separation of concerns. This is parti
 
 ### STEP 2: create a task
 
-**command**
+####  command
 
 ```
 keiji task --create --name=ping_google --desc="pings google"
 ```
 
-**output**
+####  output
 
 ```
 2024/08/10 19:27:09 creating task ping_google
 2024/08/10 19:27:09 ok
 
 ```
-**result**
+####  result
 
 ```
 keiji
@@ -204,13 +204,13 @@ return tasks.NewSchedule().On().Friday().At("10:00PM").Build()
 
 ### STEP 3: build & save a task
 
-**command**
+#### command
 
 ```
 keiji task --name=ping_google --build
 ```
 
-**output**
+####  output
 
 ```
 2024/08/10 19:46:30 task found , building...
@@ -228,13 +228,13 @@ sourcePath:  /Users/andrewodiit/keiji/tasks/ping_google
 
 ### STEP 4: check task details
 
-**command**
+#### command
 
 ```
 keiji task --get --name=ping_google
 ```
 
-**output**
+#### output
 
 ```
 TaskModel:
@@ -258,12 +258,12 @@ ErrorTxt:
 
 ### STEP 5: start system
 
-**start system command**
+#### start system command
 
 ```
 keiji system --start
 ```
-**output**
+#### output
 
 ```
 2024/08/10 19:51:44 /Users/andrewodiit/.keiji/exec/services/bus.pid: PID file not found
@@ -272,12 +272,12 @@ keiji system --start
 2024/08/10 19:51:44 service started with pid 72630
 ```
 
-**check system status command**
+#### check system status command
 
 ```
 keiji system --status
 ```
-**output**
+#### output
 
 ```
 ======== SERVICES ========
@@ -290,23 +290,23 @@ scheduler          ONLINE
 
 ### STEP 6: view logs
 
-**bus logs**
+#### bus logs
 ```
 keiji system --logs --bus 
 ```
-**output**
+#### output
 ```
 2024/08/10 19:51:44 waiting for termination signal
 2024/08/10 19:51:44 Server started at :8005
 2024/08/10 19:51:44 Server started at :8006
 ```
 
-**scheduler logs**
+#### scheduler logs
 
 ```
 keiji system --logs --scheduler
 ```
-**output**
+#### output
 
 ```
 2024/08/10 19:51:45 waiting for termination signal
@@ -314,13 +314,13 @@ time=2024-08-10T19:51:45.330+03:00 level=INFO msg="starting tcp-bus listener"
 time=2024-08-10T19:51:45.330+03:00 level=INFO msg="running start function"
 ```
 
-**task logs**
+#### task logs
 
 ```
 keiji task --logs --name=ping_google
 ```
 
-**output**
+#### output
 
 ```
 time=2024-08-11T11:18:54.687+03:00 level=INFO msg="Task Next Execution Time: 2024-08-16 22:00:00 +0300 +0300"
@@ -332,7 +332,7 @@ time=2024-08-11T11:18:54.687+03:00 level=INFO msg="Task Next Execution Time: 202
 - In the example below, i added a `fmt.Println("Pinging Google....")` statement in function.go
 and changed the `schedule.go` to run every 10 seconds.
 
-**updated source code**
+#### updated source code
 
 ```
 package main
@@ -362,7 +362,7 @@ func Function() error {
 
 ```
 
-**updated schedule**
+#### updated schedule
 
 ```
 return tasks.NewSchedule().Run().Every(10).Seconds().Build()
@@ -387,7 +387,7 @@ sourcePath:  /Users/andrewodiit/keiji/tasks/ping_google
 2024/08/11 13:31:44 restarting task ping_google
 ```
 
-**check task details**
+#### check task details
 
 ```
 keiji task --get --name=ping_google
@@ -456,12 +456,14 @@ have taken full effect
 keiji task --disable --name=ping_google
 ```
 
-☝🏾 **disable signal received by running task**
 
 ```
 time=2024-08-11T14:20:07.119+03:00 level=INFO msg="status:  200"
 time=2024-08-11T14:20:10.828+03:00 level=INFO msg="task disabled, exiting..."
 ```
+
+☝🏾 **disable signal received by running task**
+
 ```
 ====================================================================================================
 TaskModel:
