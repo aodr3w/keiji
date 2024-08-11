@@ -35,12 +35,12 @@ Manages the execution of tasks based on the schedule defined for the task.
 Reads commands from the bus and applies them as needed. These commands may be task directives e.g disable delete, stop or system level directives e.g shutdown.
 Logs all activities to provide detailed insights into task execution and system status.
 
-`task-binary`
+**task-binary**
 
 Each task, once created, is compiled into a binary executable.
 These binaries are executed on their scheduled intervals, with the scheduler managing their lifecycle.
 
-`work-space`
+**work-space**
 
 The workspace is a folder located at `$HOME/keiji`, designated for the development of tasks. It is created when the `init` command is run.
 
@@ -51,7 +51,7 @@ The workspace is a folder located at `$HOME/keiji`, designated for the developme
 go install github.com/aodr3w/keiji@latest
 ```
 
-After install, `keiji command should be available`
+After install, the keiji command should be available.
 
 
 ## USAGE
