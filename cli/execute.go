@@ -636,6 +636,21 @@ func deleteTask(name string) error {
 	if err != nil {
 		return err
 	}
+	/**check if task is disabled or inError state, if so
+	we can delete without sending a message to the scheduler
+	because such tasks are ignored by the scheduler
+	**/
+	if task.IsDisabled || task.IsError {
+		err := utils.DeleteTaskExecutable(task.Executable)
+		if err != nil {
+			return err
+		}
+		err = utils.DeleteTaskLog(task.LogPath)
+		if err != nil {
+			return err
+		}
+		return cmdRepo.DeleteTask(task)
+	}
 	return bc.StopTask(task.TaskId, false, true)
 }
 
