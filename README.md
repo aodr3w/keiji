@@ -42,8 +42,8 @@ These binaries are executed on their scheduled intervals, with the scheduler man
 
 `work-space`
 
-The work-space is a folder located in the $HOME/keiji designated for development of tasks. It is created
-when the init command is run.
+The workspace is a folder located at `$HOME/keiji`, designated for the development of tasks. It is created when the `init` command is run.
+
 
 ## INSTALLATION
 
