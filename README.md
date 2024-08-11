@@ -303,9 +303,50 @@ time=2024-08-11T11:18:54.687+03:00 level=INFO msg="Task Next Execution Time: 202
 
 ## STEP 7: modify task functionality
 
-**update source code**
+- In the example below, i added a `fmt.Println("Pinging Google....")` statement in function.go
+and changed the `schedule.go` to run every 10 seconds.
 
-**update schedule**
+**updated source code**
+
+```
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"time"
+)
+
+func Function() error {
+	/*
+		please put the logic you wish to execute in this function.
+	*/
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	fmt.Println("Pinging Google....")
+	resp, err := client.Get("https://www.google.com/")
+	fmt.Println("status: ", resp.StatusCode)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+```
+
+**updated schedule**
+
+```
+return tasks.NewSchedule().Run().Every(10).Seconds().Build()
+```
+
+- rebuild & restart task 
+
+```
+keiji task --name=ping_google --build --restart
+```
 
 **check task details**
 
