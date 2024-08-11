@@ -35,10 +35,15 @@ Manages the execution of tasks based on the schedule defined for the task.
 Reads commands from the bus and applies them as needed. These commands may be task directives e.g disable delete, stop or system level directives e.g shutdown.
 Logs all activities to provide detailed insights into task execution and system status.
 
-`Task Binary`
+`task-binary`
 
 Each task, once created, is compiled into a binary executable.
 These binaries are executed on their scheduled intervals, with the scheduler managing their lifecycle.
+
+`work-space`
+
+The work-space is a folder located in the $HOME/keiji designated for development of tasks. It is created
+when the init command is run.
 
 ## INSTALLATION
 
