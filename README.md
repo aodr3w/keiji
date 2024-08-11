@@ -24,13 +24,11 @@ Ensures consistent and reusable functionality across all components.
 Handles database access, task creation APIs, templates, and more.
 
 #### keiji-bus:
-Facilitates inter-process communication between the CLI and the scheduler.
-The bus listens for and handles commands from the CLI, such as start, stop, disable, and delete.
-Translates these commands into directives that the scheduler can execute on the respective tasks.
+Facilitates inter-process communication between the CLI and the scheduler. The bus acts as a bridge, relaying commands such as stop, disable, and delete from the CLI to the scheduler. The scheduler then listens for these commands on the bus and translates them into actionable directives that are executed as needed. These directives can be task specific or system wide.
 
 #### keiji-scheduler:
-Manages the execution of tasks based on the schedule defined by the user.
-Reads commands from the bus and applies them to the tasks, ensuring tasks are executed, paused, disabled, or deleted as required.
+Manages the execution of tasks based on the schedule defined for the task.
+Reads commands from the bus and applies them as needed. These commands may be task directives e.g disable delete, stop or system level directives e.g shutdown.
 Logs all activities to provide detailed insights into task execution and system status.
 
 ####  Task Binary:
