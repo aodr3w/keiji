@@ -8,10 +8,10 @@
 ## SYSTEM OVERVIEW
 ![Keiji Scheduling System Overview](images/KEIJI-SCHEDULING-SYSTEM-OVERVIEW.png)
 
-### Description
+### description
 keiji is a concurrent task scheduling system written in Go, designed to efficiently manage and execute tasks on a scheduled basis. The system consists of five main components that work together to provide robust task scheduling and management.
 
-**components**
+### components
 
 `keiji-main`
 
@@ -56,7 +56,7 @@ After install, `keiji command should be available`
 
 ## USAGE
 
-## STEP 1: Initializing a workspace
+### STEP 1: Initializing a workspace
 
 **command**
 
@@ -121,7 +121,7 @@ NB: Folder structure is required for clear separation of concerns. This is parti
 **WARNING ⚠️ : DO NOT MODIFY THE STRUCTURE OF THESE DIRECTORIES**
 
 
-## STEP 2: create tasks
+### STEP 2: create a task
 
 **command**
 
@@ -202,7 +202,7 @@ return tasks.NewSchedule().On().Friday().At("10:00PM").Build()
 ```
 - The time value can be either `12hour or 24hour format`.
 
-## STEP 3: build & save task
+### STEP 3: build & save a task
 
 **command**
 
@@ -226,7 +226,7 @@ sourcePath:  /Users/andrewodiit/keiji/tasks/ping_google
 2024/08/10 19:46:35 task saved
 ```
 
-## STEP 4: check task details
+### STEP 4: check task details
 
 **command**
 
@@ -256,7 +256,7 @@ IsDisabled: false
 ErrorTxt: 
 ```
 
-## STEP 5: start system
+### STEP 5: start system
 
 **start system command**
 
@@ -288,7 +288,7 @@ scheduler          ONLINE
 ```
 
 
-## STEP 6: view logs
+### STEP 6: view logs
 
 **bus logs**
 ```
@@ -324,11 +324,10 @@ keiji task --logs --name=ping_google
 
 ```
 time=2024-08-11T11:18:54.687+03:00 level=INFO msg="Task Next Execution Time: 2024-08-16 22:00:00 +0300 +0300"
-````
+```
 
 
-
-## STEP 7: modify task functionality
+### STEP 7: modify task functionality
 
 - In the example below, i added a `fmt.Println("Pinging Google....")` statement in function.go
 and changed the `schedule.go` to run every 10 seconds.
@@ -445,12 +444,12 @@ time=2024-08-11T13:33:46.424+03:00 level=INFO msg="Pinging Google...."
 time=2024-08-11T13:33:46.424+03:00 level=INFO msg="status:  200"
 time=2024-08-11T13:33:56.460+03:00 level=INFO msg="Pinging Google...."
 time=2024-08-11T13:33:56.460+03:00 level=INFO msg="status:  200"
-````
+```
 
 - ☝🏾 task logs clearly indicate that the task was restarted successfully, and our modifications
 have taken full effect
 
-## STEP 8: disable a task
+### STEP 8: disable a task
 
 
 ```
@@ -484,24 +483,24 @@ IsDisabled: true
 ErrorTxt: 
 
 ====================================================================================================
-````
+```
 
 ☝🏾 task record in database is marked as disabled so the scheduler will not attempt to pick it up. it can be enabled using the command `keiji task --enable --name=ping_google`, which makes the task runnable.
 
-## STEP 9: delete a task
+### STEP 9: delete a task
 
 ```
 keiji task --delete --name=ping_google
 ```
 
 
-## STEP 11: stop system
+### STEP 11: stop system
 
 ```
 keiji system --stop
 ```
 
-## STEP 12: uninstall system
+### STEP 12: uninstall system
 
 ```
 keiji system --uninstall
