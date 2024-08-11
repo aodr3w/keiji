@@ -13,25 +13,30 @@ keiji is a concurrent task scheduling system written in Go, designed to efficien
 
 **components**
 
-#### keiji-cli:
+`keiji-cli`:
+
 Provides a command line interface (CLI) for interacting with tasks and services.
 Users can create, manage, and monitor tasks using straightforward CLI commands.
 Supports commands for initializing workspaces, creating tasks, and more.
 
-#### keiji-core:
+`keiji-core`:
+
 Acts as the backbone of the entire system by providing essential services such as logging, storage, and utility functions.
 Ensures consistent and reusable functionality across all components.
 Handles database access, task creation APIs, templates, and more.
 
-#### keiji-bus:
+`keiji-bus`:
+
 Facilitates inter-process communication between the CLI and the scheduler. The bus acts as a bridge, relaying commands such as stop, disable, and delete from the CLI to the scheduler. The scheduler then listens for these commands on the bus and translates them into actionable directives that are executed as needed. These directives can be task specific or system wide.
 
-#### keiji-scheduler:
+`keiji-scheduler`:
+
 Manages the execution of tasks based on the schedule defined for the task.
 Reads commands from the bus and applies them as needed. These commands may be task directives e.g disable delete, stop or system level directives e.g shutdown.
 Logs all activities to provide detailed insights into task execution and system status.
 
-####  Task Binary:
+`Task Binary`:
+
 Each task, once created, is compiled into a binary executable.
 These binaries are executed on their scheduled intervals, with the scheduler managing their lifecycle.
 
