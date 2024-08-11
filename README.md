@@ -183,11 +183,7 @@ func Schedule() error {
 	return tasks.NewSchedule().Run().Every(10).Seconds().Build()
 }
 ```
-- A task can can be schedule to run on a fixed interval defined `Seconds, Minutes or Hours` e.g
-
-```
-return tasks.NewSchedule().Run().Every(10).Seconds().Build()
-```
+- ☝🏾 A task can can be schedule to run on a fixed interval defined as `Seconds, Minutes or Hours` (as shown in code above)
 
 - Alternatively, it can be scheduled to run on a specific day at a specific time e.g
 
