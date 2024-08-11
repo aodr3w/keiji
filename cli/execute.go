@@ -708,8 +708,13 @@ func NewSystemCMD() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if uninstall {
+				//first stop the system
+				err := stopAllServices()
+				if err != nil {
+					logError(err)
+				}
 				//uninstalls all services
-				err := uninstallSystem()
+				err = uninstallSystem()
 				if err != nil {
 					logError(err)
 				}
