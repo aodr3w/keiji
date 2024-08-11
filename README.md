@@ -435,21 +435,13 @@ keiji task --disable --name=ping_google`
 keiji task --delete --name=ping_google
 ```
 
-
-## STEP 10: changing database
-
-```
-modify settings.conf in workspace && restart system
-```
-
-
-## STEP 9: enable/disable log rotation
+## STEP 10: enable/disable log rotation
 
 ```
 modify settings.conf in workspace && restart system
 ```
 
-## STEP 10: stop system
+## STEP 11: stop system
 
 ```
 keiji system --stop
@@ -461,4 +453,12 @@ keiji system --stop
 keiji system --uninstall
 ```
 
+## Q/A
 
+**How do i change the database from sqllite3 to postgres**
+
+- edit the `DB_URL` in `settings.conf` to a valid postgresURL and restart the system.
+
+**Can i use a database other than `sqllite3` and `postgresql` ?
+
+- keiji only supports `sqllite3` and `postgresql`, you would need to fork the repository and modify it as you wish.
