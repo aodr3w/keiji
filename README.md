@@ -489,12 +489,16 @@ ErrorTxt:
 
 ☝🏾 task record in database is marked as disabled so the scheduler will not attempt to pick it up. it can be enabled using the command `keiji task --enable --name=ping_google`, which makes the task runnable.
 
+### STEP 10: enable task
+
+```
+keiji task --enable --name=ping_google
+```
 ### STEP 9: delete a task
 
 ```
 keiji task --delete --name=ping_google
 ```
-
 
 ### STEP 10: stop system
 
