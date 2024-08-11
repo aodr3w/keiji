@@ -287,11 +287,17 @@ time=2024-08-10T19:51:45.330+03:00 level=INFO msg="starting tcp-bus listener"
 time=2024-08-10T19:51:45.330+03:00 level=INFO msg="running start function"
 ```
 
+**task logs**
 
 ```
-keiji task --logs --name=ping_google --vim
+keiji task --logs --name=ping_google
 ```
 
+**output**
+
+```
+time=2024-08-11T11:18:54.687+03:00 level=INFO msg="Task Next Execution Time: 2024-08-16 22:00:00 +0300 +0300"
+````
 
 
 
