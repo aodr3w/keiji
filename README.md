@@ -1,5 +1,9 @@
 # KEIJI - 計時 (time keeping)
 
+## ⚠️ Beta Release
+This project is currently in **beta**. Please use with caution and report any issues.
+
+
 ## MOTIVIATION
 
 - Develop a concurrent task scheduling system in go.
