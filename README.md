@@ -5,7 +5,7 @@ This project is currently in **beta**. Please use with caution and report any is
 
 ## Platform
 - go 1.22+
-- macosx
+- macosx (apple silicon)
 - ubuntu 22.04
 
 Please ensure that you have Go 1.22 or later installed on your system to build and run this project. Detailed installation instructions for Go can be found [here](https://go.dev/doc/install).
