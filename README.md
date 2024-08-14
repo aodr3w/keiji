@@ -3,6 +3,12 @@
 ## ⚠️ Beta Release
 This project is currently in **beta**. Please use with caution and report any issues.
 
+## Platform
+
+This project is developed using Go 1.22+ on macosx Sonoma 14.5
+
+Please ensure that you have Go 1.22 or later installed on your system to build and run this project. Detailed installation instructions for Go can be found [here](https://go.dev/doc/install).
+
 
 ## MOTIVIATION
 
