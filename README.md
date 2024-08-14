@@ -539,8 +539,8 @@ Password:
 
 **How do i fix errors in a task ?**
 
-When an error on a task occurs, the task.IsError will be set to true and the scheduler will not pick the task
-until isError is set to False. Inorder to resolve the error , do the following;
+When an error occurs, the `task.IsError` field will be set to `true` and the scheduler will not pick the task
+until `isError is set to False`. Inorder to resolve the error , do the following;
 
 - update `function.go` for the task i.e fix the error.
 
