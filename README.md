@@ -536,6 +536,27 @@ Password:
 2024/08/14 17:31:39 good bye :-)
 ```
 ## Q/A
+
+**How do i fix errors in a task ?**
+
+When an error on a task occurs, the task.IsError will be set to true and the scheduler will not pick the task
+until isError is set to False. Inorder to resolve the error , do the following;
+
+- update `function.go` for the task i.e fix the error.
+
+- rebuild the task to update the task's binary i.e;
+
+```
+keiji task --build --name=<task_name>
+```
+- mark the task as resolved e.g
+
+```
+keiji task --resolve --name=<task_name>
+```
+
+assuming the scheduler is running, it will pick it up for execution.
+
 **How do i change my workspace settings ?**
 
 Open settings.conf , you can modify one of 4 settings:
