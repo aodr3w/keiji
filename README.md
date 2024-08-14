@@ -328,7 +328,7 @@ time=2024-08-11T11:18:54.687+03:00 level=INFO msg="Task Next Execution Time: 202
 
 ### STEP 7: modify task functionality
 
-- In the example below, i added a `fmt.Println("Pinging Google....")` statement in function.go
+- In the example below, i added a `fmt.Println("Pinging Google....")` statement in `function.go`
 and changed the `schedule.go` to run every 10 seconds.
 
 #### updated source code
