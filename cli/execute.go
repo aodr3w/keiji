@@ -143,7 +143,7 @@ func createWorkSpace() error {
 		return err
 	}
 	//copy settings.conf file to workSpace
-	err = utils.CopyFile(filepath.Join(repoPath, "templates", "settings.conf"), paths.WORKSPACE_SETTINGS)
+	err = utils.CopyFile(filepath.Join(repoPath, "templates", "settings.conf"), paths.WORKSPACE_SETTINGS, 0644)
 	if err != nil {
 		return err
 	}
@@ -597,7 +597,7 @@ func createTask(name string, description string, force bool) error {
 	//create destination folder
 	err = filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
 		if d.Name() == "templates" {
-			return utils.CopyDir(filepath.Join(path, "tasks"), taskPath)
+			return utils.CopyDir(filepath.Join(path, "tasks"), taskPath, 0644)
 		}
 		return nil
 	})
