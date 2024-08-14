@@ -509,9 +509,33 @@ keiji system --stop
 ### STEP 12: uninstall system
 
 ```
-keiji system --uninstall
+sudo keiji system --uninstall
 ```
 
+```
+Password:
+2024/08/14 17:31:39 kill error: no such process
+2024/08/14 17:31:39 uninstalling service bus
+2024/08/14 17:31:39 uninstalling service scheduler
+2024/08/14 17:31:39 removing workspace
+2024/08/14 17:31:39 deleting system folder
+2024/08/14 17:31:39 deleting keiji-bus@v0.1.1
+2024/08/14 17:31:39 deleting keiji-bus@v0.1.2
+2024/08/14 17:31:39 deleting keiji-core@v0.2.2
+2024/08/14 17:31:39 deleting keiji-core@v0.2.3
+2024/08/14 17:31:39 deleting keiji-core@v0.2.4
+2024/08/14 17:31:39 deleting keiji-core@v0.2.5
+2024/08/14 17:31:39 deleting keiji-core@v0.2.6
+2024/08/14 17:31:39 deleting keiji-scheduler@v0.1.0
+2024/08/14 17:31:39 deleting keiji-scheduler@v0.1.2
+2024/08/14 17:31:39 deleting keiji-scheduler@v0.2.1
+2024/08/14 17:31:39 deleting keiji@v0.2.0
+2024/08/14 17:31:39 deleting keiji@v0.2.1
+2024/08/14 17:31:39 deleting keiji@v0.3.1
+2024/08/14 17:31:39 uninstalling service keiji
+2024/08/14 17:31:39 uninstall complete
+2024/08/14 17:31:39 good bye :-)
+```
 ## Q/A
 **How do i change my workspace settings ?**
 
