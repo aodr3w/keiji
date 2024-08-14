@@ -336,6 +336,7 @@ func clearCache() error {
 uninstalls specific service
 */
 func uninstallService(service c.Service) error {
+	logWarn(fmt.Sprintf("uninstalling service %s", service))
 	servicePath, err := getServicePath(service)
 	if err != nil {
 		return err
@@ -366,7 +367,14 @@ func getServicePath(service c.Service) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	binPath := filepath.Join(goPath, "bin", fmt.Sprintf("%v-%v", "keiji", service))
+	main := "keiji"
+	var binPath string
+	if strings.EqualFold(string(service), main) {
+		binPath = filepath.Join(goPath, "bin", main)
+	} else {
+		binPath = filepath.Join(goPath, "bin", fmt.Sprintf("%v-%v", main, service))
+	}
+
 	ok, err := utils.PathExists(binPath)
 	if err != nil {
 		return "", err
@@ -383,7 +391,6 @@ func uninstallSystem() error {
 	}
 	//remove all services
 	for _, service := range c.SERVICES {
-		logWarn(fmt.Sprintf("uninstalling service %s", service))
 		err := uninstallService(service)
 		if err != nil {
 			if errors.Is(err, cmdErrors.ErrServiceNotFound) {
@@ -428,7 +435,17 @@ func uninstallSystem() error {
 		return nil
 	})
 
-	return err
+	if err != nil {
+		return err
+	}
+	//remove main programm
+	err = uninstallService("keiji")
+	if err != nil {
+		return err
+	}
+	logInfo("uninstall complete")
+	logInfo("good bye :-)")
+	return nil
 }
 
 /*
