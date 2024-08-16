@@ -8,14 +8,12 @@
 - Please ensure that you have Go 1.22 or later installed on your system to build and run this project. Detailed installation instructions for Go can be found [here](https://go.dev/doc/install).
 
 ## Platform
-- macosx (apple silicon)
+- macosx sonoma +
 - ubuntu 22.04
-
 
 ## MOTIVIATION
 
 - Develop a concurrent task scheduling system in go.
-
 
 ## SYSTEM OVERVIEW
 ![Keiji Scheduling System Overview](images/KEIJI-SCHEDULING-SYSTEM-OVERVIEW.png)
