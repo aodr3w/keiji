@@ -557,7 +557,7 @@ Password:
 2024/08/14 17:31:39 good bye :-)
 ```
 
-## Q/A
+## q&a
 
 **How do i fix errors in a task ?**
 
