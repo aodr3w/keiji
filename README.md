@@ -1,21 +1,21 @@
 # KEIJI - 計時 (time keeping)
 
-## Note:
-- If you face any issues, please feel free to open an github issue. It will be addressed as soon as possible
+## note:
+- If you face any issues, please feel free to open an github issue. It will be addressed as soon as possible.
 
-## Dependencies
+## dependencies
 - go 1.22+
 - Please ensure that you have Go 1.22 or later installed on your system to build and run this project. Detailed installation instructions for Go can be found [here](https://go.dev/doc/install).
 
-## Platform
+## platform
 - macosx sonoma +
 - ubuntu 22.04
 
-## MOTIVIATION
+## motivation
 
 - Develop a concurrent task scheduling system in go.
 
-## SYSTEM OVERVIEW
+## system overview
 ![Keiji Scheduling System Overview](images/KEIJI-SCHEDULING-SYSTEM-OVERVIEW.png)
 
 ### description
@@ -54,7 +54,7 @@ Each task, once created, is compiled into a binary executable. These binaries ar
 The workspace is a folder located at `$HOME/keiji`, designated for the development of tasks. It is created when the `init` command is run.
 
 
-## INSTALLATION
+## installation
 
 ```
 go install github.com/aodr3w/keiji@latest
@@ -63,9 +63,9 @@ go install github.com/aodr3w/keiji@latest
 After install, the keiji command should be available.
 
 
-## USAGE
+## usage
 
-### STEP 1: Initializing a workspace
+### step 1: Initializing a workspace
 
 #### command
 
@@ -130,7 +130,7 @@ NB: Folder structure is required for clear separation of concerns. This is parti
 **WARNING ⚠️ : DO NOT MODIFY THE STRUCTURE OF THESE DIRECTORIES**
 
 
-### STEP 2: create a task
+### step 2: create a task
 
 ####  command
 
@@ -211,7 +211,7 @@ return tasks.NewSchedule().On().Friday().At("10:00PM").Build()
 ```
 - The time value can be either `12hour or 24hour format`.
 
-### STEP 3: build & save a task
+### step 3: build & save a task
 
 #### command
 
@@ -235,7 +235,7 @@ sourcePath:  /Users/andrewodiit/keiji/tasks/ping_google
 2024/08/10 19:46:35 task saved
 ```
 
-### STEP 4: check task details
+### step 4: check task details
 
 #### command
 
@@ -265,7 +265,7 @@ IsDisabled: false
 ErrorTxt: 
 ```
 
-### STEP 5: start system
+### step 5: start system
 
 #### start system command
 
@@ -297,7 +297,7 @@ scheduler          ONLINE
 ```
 
 
-### STEP 6: view logs
+### step 6: view logs
 
 #### bus logs
 ```
@@ -337,7 +337,7 @@ time=2024-08-11T11:18:54.687+03:00 level=INFO msg="Task Next Execution Time: 202
 
 **NB**: you can supply an editor command e.g `--code` , `--vim`, `--nano` when viewing logs to open file in an editor . Choose one that available on your OS.
 
-### STEP 7: modify task functionality
+### step 7: modify task functionality
 
 - In the example below, i added a `fmt.Println("Pinging Google....")` statement in `function.go`
 and changed the `schedule.go` to run every 10 seconds.
@@ -459,7 +459,7 @@ time=2024-08-11T13:33:56.460+03:00 level=INFO msg="status:  200"
 - ☝🏾 task logs clearly indicate that the task was restarted successfully, and our modifications
 have taken full effect
 
-### STEP 8: disable a task
+### step 8: disable a task
 
 
 ```
@@ -499,24 +499,24 @@ ErrorTxt:
 
 ☝🏾 task record in database is marked as disabled so the scheduler will not attempt to pick it up. it can be enabled using the command `keiji task --enable --name=ping_google`, which makes the task runnable.
 
-### STEP 9: enable task
+### step 9: enable task
 
 ```
 keiji task --enable --name=ping_google
 ```
-### STEP 10: delete a task
+### step 10: delete a task
 
 ```
 keiji task --delete --name=ping_google
 ```
 
-### STEP 11: stop system
+### step 11: stop system
 
 ```
 keiji system --stop
 ```
 
-### STEP 12: uninstall system
+### step 12: uninstall system
 
 **macos**
 
