@@ -1,7 +1,7 @@
 # KEIJI - 計時 (time keeping)
 
 ## note:
-- If you face any issues, please feel free to open an issue.
+- If you face any issues, please feel free to open an github issue. It will be addressed as soon as possible
 
 ## Platform
 - go 1.22+
