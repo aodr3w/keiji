@@ -336,6 +336,7 @@ keiji task --logs --name=ping_google
 time=2024-08-11T11:18:54.687+03:00 level=INFO msg="Task Next Execution Time: 2024-08-16 22:00:00 +0300 +0300"
 ```
 
+**NB**: you can supply an editor command e.g `--code` , `--vim`, `--nano` when viewing logs to open file in an editor . Choose one that available on your OS.
 
 ### STEP 7: modify task functionality
 
@@ -518,8 +519,18 @@ keiji system --stop
 
 ### STEP 12: uninstall system
 
+**macos**
+
 ```
 sudo keiji system --uninstall
+```
+
+**ubuntu**
+
+```
+ubuntu@sd-99603:~$ which keiji
+/home/ubuntu/go/bin/keiji
+ubuntu@sd-99603:~$ sudo -E /home/ubuntu/go/bin/keiji system --uninstall
 ```
 
 ```
@@ -546,6 +557,7 @@ Password:
 2024/08/14 17:31:39 uninstall complete
 2024/08/14 17:31:39 good bye :-)
 ```
+
 ## Q/A
 
 **How do i fix errors in a task ?**
