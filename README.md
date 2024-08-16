@@ -12,8 +12,6 @@
 - ubuntu 22.04
 
 
-
-
 ## MOTIVIATION
 
 - Develop a concurrent task scheduling system in go.
