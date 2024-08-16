@@ -1,6 +1,6 @@
 # KEIJI - 計時 (time keeping)
 
-## note:
+## Note:
 - If you face any issues, please feel free to open an github issue. It will be addressed as soon as possible
 
 ## Dependencies
