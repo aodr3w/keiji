@@ -1,7 +1,7 @@
 # KEIJI - 計時 (time keeping)
 
-## ⚠️ Beta Release
-This project is currently in **beta**. Please use with caution and report any issues.
+## note:
+- If you face any issues, please feel free to open an issue.
 
 ## Platform
 - go 1.22+
@@ -20,7 +20,7 @@ Please ensure that you have Go 1.22 or later installed on your system to build a
 ![Keiji Scheduling System Overview](images/KEIJI-SCHEDULING-SYSTEM-OVERVIEW.png)
 
 ### description
-keiji is a concurrent task scheduling system written in Go, designed to efficiently manage and execute tasks on a scheduled basis. The system consists of five main components that work together to provide robust task scheduling and management.
+keiji is a concurrent task scheduling system written in Go, designed to manage and execute tasks on a scheduled basis. The system consists of five main components that work together to provide robust task scheduling and management.
 
 ### components
 
